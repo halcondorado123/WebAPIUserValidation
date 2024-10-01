@@ -3,13 +3,11 @@ using Models;
 
 namespace DataAccess
 {
-    public class ValidationDbContext : DbContext
+    public class UserDbContext : DbContext
     {
-        public ValidationDbContext(DbContextOptions<ValidationDbContext> options) : base(options) { }
+        public UserDbContext(DbContextOptions<UserDbContext> options) : base(options) { }
 
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-        }
+        protected override void OnModelCreating(ModelBuilder modelBuilder) { }
 
         public DbSet<ClientME>? Client { get; set; }
         public DbSet<GenreME>? Gender { get; set; }

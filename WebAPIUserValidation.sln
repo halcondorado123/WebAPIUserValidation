@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34309.116
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebAPIUserValidation", "WebAPIUserValidation\WebAPIUserValidation.csproj", "{10F11991-A879-4E7F-8A39-00EEA5F0C275}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APIUserValidation", "WebAPIUserValidation\APIUserValidation.csproj", "{10F11991-A879-4E7F-8A39-00EEA5F0C275}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{4DF8D04D-27CA-40FE-8988-AA54A9A459E1}"
 EndProject
