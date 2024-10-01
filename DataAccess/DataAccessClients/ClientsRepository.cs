@@ -10,7 +10,7 @@ namespace DataAccess.DataAccessClients
 {
     public class ClientsRepository : IClientsRepository
     {
-        private ConfigurationData _connectionString { get; set; }
+        private ConfigurationData _connectionString;
 
         public ClientsRepository(ConfigurationData connectionString)
         {
@@ -24,27 +24,260 @@ namespace DataAccess.DataAccessClients
 
         public List<ClientME> GetClients()
         {
-            throw new NotImplementedException();
+
+            List<ClientME> clients = new List<ClientME>();
+
+            try
+            {
+                SqlConnection dbConnection = DBConnection();
+                SqlCommand command = new SqlCommand("GET_CLIENTS", dbConnection);
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+                command.CommandTimeout = 9999;
+
+                dbConnection.Open();
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        ClientME client = new ClientME();
+
+                        client.ClientId = (reader.GetValue(0) != DBNull.Value ? reader.GetInt32(0) : 0);
+
+                        client.RolId = new RoleME();
+                        client.RolId.RolID = (reader.GetValue(1) != DBNull.Value ? reader.GetInt32(1) : 0);
+                        client.RolId.RolType = (!reader.IsDBNull(2) ? reader.GetString(2) : string.Empty);
+
+                        client.Identification = new IdentificationME();
+                        client.Identification.IdentificationId = (reader.GetValue(3) != DBNull.Value ? reader.GetInt32(3) : 0);
+                        client.Identification.IdentificationType = (!reader.IsDBNull(4) ? reader.GetString(4) : string.Empty);
+
+                        client.IdentificationNumber = (!reader.IsDBNull(5) ? reader.GetString(5) : string.Empty);
+
+                        client.ClientName = (!reader.IsDBNull(6) ? reader.GetString(6) : string.Empty);
+                        client.ClientLastName = (!reader.IsDBNull(7) ? reader.GetString(7) : string.Empty);
+
+                        client.GenreId = new GenreME();
+                        client.GenreId.GenderId = (reader.GetValue(8) != DBNull.Value ? reader.GetInt32(8) : 0);
+                        client.GenreId.GenderType = (!reader.IsDBNull(9) ? reader.GetString(9) : string.Empty);
+
+                        client.RelatId = new RelationShME();
+                        client.RelatId.RelationId = (reader.GetValue(10) != DBNull.Value ? reader.GetInt32(10) : 0);
+                        client.RelatId.RelationType = (!reader.IsDBNull(11) ? reader.GetString(11) : string.Empty);
+
+                        client.Age = (reader.GetValue(12) != DBNull.Value ? reader.GetInt32(12) : 0);
+                        client.Birthday = (reader.GetValue(13) != DBNull.Value ? reader.GetDateTime(13) : DateTime.MinValue);
+
+                        client.UsuId = (reader.GetValue(14) != DBNull.Value ? reader.GetInt32(14) : 0);
+
+                        clients.Add(client);
+                    }
+                }
+
+                dbConnection.Close();
+                dbConnection.Dispose();
+
+            }
+
+            catch (Exception ex)
+            {
+                ex.Message.ToString();
+            }
+
+            return clients;
+
         }
 
-        public ClientME GetClient(int id)
+
+        public ClientME GetClientById(int id)
         {
-            throw new NotImplementedException();
+            ClientME client = new ClientME();
+
+            try
+            {
+                SqlConnection dbConnection = DBConnection();
+                SqlCommand command = new SqlCommand("GET_CLIENT_BY_ID", dbConnection);
+                command.CommandType = System.Data.CommandType.StoredProcedure;
+                command.CommandTimeout = 9999;
+                command.Parameters.AddWithValue("@CLIENT_ID", id);
+
+                dbConnection.Open();
+
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        client.ClientId = (reader.GetValue(0) != DBNull.Value ? reader.GetInt32(0) : 0);
+
+                        client.RolId = new RoleME();
+                        client.RolId.RolID = (reader.GetValue(1) != DBNull.Value ? reader.GetInt32(1) : 0);
+                        client.RolId.RolType = (!reader.IsDBNull(2) ? reader.GetString(2) : string.Empty);
+
+                        client.Identification = new IdentificationME();
+                        client.Identification.IdentificationId = (reader.GetValue(3) != DBNull.Value ? reader.GetInt32(3) : 0);
+                        client.Identification.IdentificationType = (!reader.IsDBNull(4) ? reader.GetString(4) : string.Empty);
+
+                        client.IdentificationNumber = (!reader.IsDBNull(5) ? reader.GetString(5) : string.Empty);
+
+                        client.ClientName = (!reader.IsDBNull(6) ? reader.GetString(6) : string.Empty);
+                        client.ClientLastName = (!reader.IsDBNull(7) ? reader.GetString(7) : string.Empty);
+
+                        client.GenreId = new GenreME();
+                        client.GenreId.GenderId = (reader.GetValue(8) != DBNull.Value ? reader.GetInt32(8) : 0);
+                        client.GenreId.GenderType = (!reader.IsDBNull(9) ? reader.GetString(9) : string.Empty);
+
+                        client.RelatId = new RelationShME();
+                        client.RelatId.RelationId = (reader.GetValue(10) != DBNull.Value ? reader.GetInt32(10) : 0);
+                        client.RelatId.RelationType = (!reader.IsDBNull(11) ? reader.GetString(11) : string.Empty);
+
+                        client.Age = (reader.GetValue(12) != DBNull.Value ? reader.GetInt32(12) : 0);
+                        client.Birthday = (reader.GetValue(13) != DBNull.Value ? reader.GetDateTime(13) : DateTime.MinValue);
+
+                        client.UsuId = (reader.GetValue(14) != DBNull.Value ? reader.GetInt32(14) : 0);
+                    }
+                }
+
+                dbConnection.Close();
+                dbConnection.Dispose();
+
+            }
+
+            catch (Exception ex)
+            {
+                ex.Message.ToString();
+            }
+
+            return client;
         }
+
 
         public int CreateClient(ClientME client)
         {
-            throw new NotImplementedException();
+            int id = 0;
+
+            try
+            {
+                using (SqlConnection dbConnection = DBConnection())
+                {
+                    SqlCommand command = new SqlCommand("CREATE_CLIENT", dbConnection);
+                    command.CommandType = System.Data.CommandType.StoredProcedure;
+                    command.CommandTimeout = 9999;
+
+                    dbConnection.Open();
+
+                    command.Parameters.AddWithValue("@USU_ID", client.UsuId);
+                    command.Parameters.AddWithValue("@IDENTI_ID", client.Identification?.IdentificationId ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@IDENTI_NUMBER", client.IdentificationNumber);
+                    command.Parameters.AddWithValue("@CLIENT_NAME", client.ClientName);
+                    command.Parameters.AddWithValue("@CLIENT_LAST_NAME", client.ClientLastName);
+                    command.Parameters.AddWithValue("@GENRE_ID", client.GenreId?.GenderId ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@RELAT_ID", client.RelatId?.RelationId ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@CLIENT_AGE", client.Age);
+                    command.Parameters.AddWithValue("@CLIENT_BIRTHDAY", client.ClientId);
+
+                    using (SqlDataReader dr = command.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            id = dr.GetInt32(0);
+                        }
+                    }
+
+                    dbConnection.Close();
+                    dbConnection.Dispose();
+
+                }
+            }
+
+            catch (Exception ex)
+            {
+                ex.Message.ToString();
+            }
+
+            return id;
         }
-        public int UpdateClient(ClientME client)
+
+
+        public int ModifyClient(ClientME client)
         {
-            throw new NotImplementedException();
+
+            int UpdateUser = 0;
+
+            try
+            {
+                using (SqlConnection dbConnection = DBConnection())
+                {
+                    SqlCommand command = new SqlCommand("MODIFY_CLIENT", dbConnection);
+                    command.CommandType = System.Data.CommandType.StoredProcedure;
+                    command.CommandTimeout = 9999;
+
+                    dbConnection.Open();
+
+                    command.Parameters.AddWithValue("@USU_ID", client.UsuId);
+                    command.Parameters.AddWithValue("@IDENTI_ID", client.Identification?.IdentificationId ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@IDENTI_NUMBER", client.IdentificationNumber);
+                    command.Parameters.AddWithValue("@CLIENT_NAME", client.ClientName);
+                    command.Parameters.AddWithValue("@CLIENT_LAST_NAME", client.ClientLastName);
+                    command.Parameters.AddWithValue("@GENRE_ID", client.GenreId?.GenderId ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@RELAT_ID", client.RelatId?.RelationId ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@CLIENT_AGE", client.Age);
+                    command.Parameters.AddWithValue("@CLIENT_BIRTHDAY", client.ClientId);
+                    command.Parameters.AddWithValue("@CLIENT_ID", client.ClientId);
+
+
+                    command.ExecuteNonQuery();
+
+                    UpdateUser = 1;
+
+                    dbConnection.Close();
+                    dbConnection.Dispose();
+                }
+            }
+
+            catch (Exception ex)
+            {
+                ex.Message.ToString();
+            }
+
+            return UpdateUser;
+
         }
+
 
         public int DeleteClient(int id)
         {
-            throw new NotImplementedException();
+
+            int ValidateDelete = 0;
+
+            try
+            {
+                using (SqlConnection dbConnection = DBConnection())
+                {
+                    SqlCommand command = new SqlCommand("DELETE_CLIENT", dbConnection);
+                    command.CommandType = System.Data.CommandType.StoredProcedure;
+                    command.CommandTimeout = 9999;
+
+                    dbConnection.Open();
+
+                    command.Parameters.AddWithValue("@CLIENT_ID", id);
+
+                    command.ExecuteNonQuery();
+
+                    ValidateDelete = 1;
+
+                    dbConnection.Close();
+                    dbConnection.Dispose();
+                }
+            }
+
+            catch (Exception ex)
+            {
+                ex.Message.ToString();
+            }
+
+            return ValidateDelete;
+
         }
-      
+
     }
 }

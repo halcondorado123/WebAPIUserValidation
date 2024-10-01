@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,6 +9,11 @@ namespace DataAccess.DataAccessUsers
 {
     public interface IUsersRepository
     {
-
+        List<UserInfoME> GetUsers();
+        UserInfoME GetUserById(int id);
+        int CreateUser(UserInfoME usuarios);
+        UserInfoME ValidateUser(UserInfoME usuario);
+        int ModifyUser(UserInfoME usuarios);
+        int DeleteUser(int id);
     }
 }

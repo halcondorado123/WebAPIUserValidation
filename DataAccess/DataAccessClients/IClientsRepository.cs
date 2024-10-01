@@ -10,9 +10,9 @@ namespace DataAccess.DataAccessClients
     public interface IClientsRepository
     {
         List<ClientME> GetClients();
-        ClientME GetClient(int id);
+        ClientME GetClientById(int id);
         int CreateClient(ClientME client);
-        int UpdateClient(ClientME client);
+        int ModifyClient(ClientME client);
         int DeleteClient(int id);
     }
 }
