@@ -9,11 +9,8 @@ using System.Threading.Tasks;
 namespace Models
 {
     [Table("UserInfo", Schema = "UVA")]
-    public class UserInfoME
+    public class UserInfoME : ClientME
     {
-        [Key]
-        public int UsuId { get; set; }
-
         [Required]
         [MaxLength(100)]
         [Column(TypeName = "varchar(100)")] // Especifica el tipo de datos en la base de datos
@@ -23,9 +20,5 @@ namespace Models
         [Required]
         [Column(TypeName = "varchar(200)")]
         public string? UserPassword { get; set; }
-
-        public ClientME? UsuClient { get; set; }
-
-
     }
 }

@@ -11,9 +11,9 @@ namespace DataAccess.DataAccessUsers
     {
         List<UserInfoME> GetUsers();
         UserInfoME GetUserById(int id);
-        int CreateUser(UserInfoME usuarios);
+        int CreateUser(UserInfoME user);
         UserInfoME ValidateUser(UserInfoME usuario);
-        int ModifyUser(UserInfoME usuarios);
-        int DeleteUser(int id);
+        bool UpdateUser(UserInfoME user);
+        bool DeleteUser(int id); // Opcional, si necesitas eliminar usuarios
     }
 }

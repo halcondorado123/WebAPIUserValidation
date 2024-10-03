@@ -19,13 +19,13 @@ namespace APIUserValidation.Migrations
                 schema: "UVA",
                 columns: table => new
                 {
-                    IdentificationId = table.Column<int>(type: "int", nullable: false)
+                    GenderId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    IdentificationType = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                    GenderType = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GenreME", x => x.IdentificationId);
+                    table.PrimaryKey("PK_GenreME", x => x.GenderId);
                 });
 
             migrationBuilder.CreateTable(
@@ -96,7 +96,7 @@ namespace APIUserValidation.Migrations
                     IdentificationNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClientName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClientLastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    GenreIdIdentificationId = table.Column<int>(type: "int", nullable: true),
+                    GenreIdGenderId = table.Column<int>(type: "int", nullable: true),
                     RelatIdRelationId = table.Column<int>(type: "int", nullable: true),
                     Age = table.Column<int>(type: "int", nullable: false),
                     Birthday = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -106,11 +106,11 @@ namespace APIUserValidation.Migrations
                 {
                     table.PrimaryKey("PK_ClientME", x => x.ClientId);
                     table.ForeignKey(
-                        name: "FK_ClientME_GenreME_GenreIdIdentificationId",
-                        column: x => x.GenreIdIdentificationId,
+                        name: "FK_ClientME_GenreME_GenreIdGenderId",
+                        column: x => x.GenreIdGenderId,
                         principalSchema: "UVA",
                         principalTable: "GenreME",
-                        principalColumn: "IdentificationId");
+                        principalColumn: "GenderId");
                     table.ForeignKey(
                         name: "FK_ClientME_IdentificationME_IdentificationId",
                         column: x => x.IdentificationId,
@@ -154,10 +154,10 @@ namespace APIUserValidation.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_ClientME_GenreIdIdentificationId",
+                name: "IX_ClientME_GenreIdGenderId",
                 schema: "UVA",
                 table: "ClientME",
-                column: "GenreIdIdentificationId");
+                column: "GenreIdGenderId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClientME_IdentificationId",

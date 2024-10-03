@@ -42,7 +42,7 @@ namespace APIUserValidation.Migrations
                     b.Property<string>("ClientName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int?>("GenreIdIdentificationId")
+                    b.Property<int?>("GenreIdGenderId")
                         .HasColumnType("int");
 
                     b.Property<int?>("IdentificationId")
@@ -62,7 +62,7 @@ namespace APIUserValidation.Migrations
 
                     b.HasKey("ClientId");
 
-                    b.HasIndex("GenreIdIdentificationId");
+                    b.HasIndex("GenreIdGenderId");
 
                     b.HasIndex("IdentificationId");
 
@@ -75,18 +75,18 @@ namespace APIUserValidation.Migrations
 
             modelBuilder.Entity("Models.GenreME", b =>
                 {
-                    b.Property<int>("IdentificationId")
+                    b.Property<int>("GenderId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdentificationId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GenderId"));
 
-                    b.Property<string>("IdentificationType")
+                    b.Property<string>("GenderType")
                         .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
-                    b.HasKey("IdentificationId");
+                    b.HasKey("GenderId");
 
                     b.ToTable("GenreME", "UVA");
                 });
@@ -194,7 +194,7 @@ namespace APIUserValidation.Migrations
                 {
                     b.HasOne("Models.GenreME", "GenreId")
                         .WithMany()
-                        .HasForeignKey("GenreIdIdentificationId");
+                        .HasForeignKey("GenreIdGenderId");
 
                     b.HasOne("Models.IdentificationME", "Identification")
                         .WithMany()

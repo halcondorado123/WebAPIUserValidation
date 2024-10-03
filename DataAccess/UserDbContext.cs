@@ -11,7 +11,7 @@ namespace DataAccess
 
         public DbSet<ClientME>? Client { get; set; }
         public DbSet<GenreME>? Gender { get; set; }
-        public DbSet<IdClientME>? Identification { get; set; }
+        public DbSet<IdentificationME>? Identification { get; set; }
         public DbSet<IdentificationME>? IdType { get; set; }
         public DbSet<RelationShME>? Relationship { get; set; }
         public DbSet<RoleME>? Role { get; set; }
