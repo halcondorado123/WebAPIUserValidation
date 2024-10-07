@@ -1,27 +1,68 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Models
+[Table("ClientME", Schema = "UVA")]
+public class ClientME
 {
-    [Table("ClientME", Schema = "UVA")]
-    public class ClientME
+    [Key]
+    [Column("ClientId")] // Nombre exacto en SQL
+    public int ClientId { get; set; }
+
+    //[Column("RolId")] // Nombre exacto en SQL
+    //public int? RolId { get; set; }
+
+    [ForeignKey("RolId")]
+    public RoleME? Role { get; set; } // Propiedad de navegación
+
+    //[Column("IdentificationId")] // Nombre exacto en SQL
+    //public int? IdentificationId { get; set; }
+
+    [ForeignKey("Identification")]
+    public IdentificationME? Identification { get; set; }
+
+    [Column("IdentificationNumber")] // Nombre exacto en SQL
+    public string? IdentificationNumber { get; set; }
+
+    [Column("ClientName")] // Nombre exacto en SQL
+    public string? ClientName { get; set; }
+
+    [Column("ClientLastName")] // Nombre exacto en SQL
+    public string? ClientLastName { get; set; }
+
+    //[Column("GenreId")] // Nombre exacto en SQL
+    //public int? GenreId { get; set; }
+
+    [ForeignKey("GenreId")]
+    public GenreME? Genre { get; set; }
+
+    //[Column("RelatId")] // Nombre exacto en SQL
+    //public int? RelatId { get; set; }
+
+    [ForeignKey("RelatId")]
+    public RelationShME? Relation { get; set; }
+
+    [Column("Age")] // Nombre exacto en SQL
+    public int Age { get; set; }
+
+    [Column("Birthday")] // Nombre exacto en SQL
+    public DateTime Birthday { get; set; }
+
+    // Método para calcular la edad
+    public int CalculateAge()
     {
-        [Key]
-        public int ClientId { get; set; }
-        public RoleME? RolId { get; set; }
-        public IdentificationME? Identification { get; set; }
-        public string? IdentificationNumber{ get; set; }
-        public string? ClientName { get; set; }
-        public string? ClientLastName { get; set; }
-        public GenreME? GenreId { get; set; }
-        public RelationShME? RelatId { get; set; }
-        public int Age { get; set; }
-        public DateTime Birthday { get; set; }
-        public int UsuId { get; set; }
+        DateTime now = DateTime.Now;
+        int age = now.Year - Birthday.Year;
+
+        // Ajuste si el cumpleaños aún no ha ocurrido este año
+        if (now < Birthday.AddYears(age))
+        {
+            age--;
+        }
+
+        return age;
     }
+
+    [Column("UsuId")] // Nombre exacto en SQL
+    public int UsuId { get; set; }
 }

@@ -2,6 +2,7 @@
 using Models;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -24,69 +25,83 @@ namespace DataAccess.DataAccessClients
 
         public List<ClientME> GetClients()
         {
-
             List<ClientME> clients = new List<ClientME>();
 
             try
             {
-                SqlConnection dbConnection = DBConnection();
-                SqlCommand command = new SqlCommand("GET_CLIENTS", dbConnection);
-                command.CommandType = System.Data.CommandType.StoredProcedure;
-                command.CommandTimeout = 9999;
-
-                dbConnection.Open();
-
-                using (SqlDataReader reader = command.ExecuteReader())
+                using (SqlConnection dbConnection = DBConnection())
                 {
-                    while (reader.Read())
+                    using (SqlCommand command = new SqlCommand("[UVA].[SP_GET_CLIENTS]", dbConnection))
                     {
-                        ClientME client = new ClientME();
+                        command.CommandTimeout = 9999;
 
-                        client.ClientId = (reader.GetValue(0) != DBNull.Value ? reader.GetInt32(0) : 0);
+                        dbConnection.Open();
 
-                        client.RolId = new RoleME();
-                        client.RolId.RolID = (reader.GetValue(1) != DBNull.Value ? reader.GetInt32(1) : 0);
-                        client.RolId.RolType = (!reader.IsDBNull(2) ? reader.GetString(2) : string.Empty);
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            while (reader.Read())
+                            {
+                                ClientME client = new ClientME
+                                {
+                                    ClientId = reader.IsDBNull(reader.GetOrdinal("ClientId")) ? 0 : reader.GetInt32(reader.GetOrdinal("ClientId")),
 
-                        client.Identification = new IdentificationME();
-                        client.Identification.IdentificationId = (reader.GetValue(3) != DBNull.Value ? reader.GetInt32(3) : 0);
-                        client.Identification.IdentificationType = (!reader.IsDBNull(4) ? reader.GetString(4) : string.Empty);
+                                    Role = new RoleME
+                                    {
+                                        RolID = reader.IsDBNull(reader.GetOrdinal("RolID")) ? 0 : reader.GetInt32(reader.GetOrdinal("RolID")),
+                                        RolType = reader.IsDBNull(reader.GetOrdinal("RolType")) ? string.Empty : reader.GetString(reader.GetOrdinal("RolType"))
+                                    },  // Cambiar a coma aquí
 
-                        client.IdentificationNumber = (!reader.IsDBNull(5) ? reader.GetString(5) : string.Empty);
+                                    Identification = new IdentificationME
+                                    {
+                                        IdentificationId = reader.IsDBNull(reader.GetOrdinal("IdentificationId")) ? 0 : reader.GetInt32(reader.GetOrdinal("IdentificationId")),
+                                        IdentificationType = reader.IsDBNull(reader.GetOrdinal("IdentificationType")) ? string.Empty : reader.GetString(reader.GetOrdinal("IdentificationType"))
+                                    },
 
-                        client.ClientName = (!reader.IsDBNull(6) ? reader.GetString(6) : string.Empty);
-                        client.ClientLastName = (!reader.IsDBNull(7) ? reader.GetString(7) : string.Empty);
+                                    IdentificationNumber = reader.IsDBNull(reader.GetOrdinal("IdentificationNumber")) ? string.Empty : reader.GetString(reader.GetOrdinal("IdentificationNumber")),
+                                    ClientName = reader.IsDBNull(reader.GetOrdinal("ClientName")) ? string.Empty : reader.GetString(reader.GetOrdinal("ClientName")),
+                                    ClientLastName = reader.IsDBNull(reader.GetOrdinal("ClientLastName")) ? string.Empty : reader.GetString(reader.GetOrdinal("ClientLastName")),
 
-                        client.GenreId = new GenreME();
-                        client.GenreId.GenderId = (reader.GetValue(8) != DBNull.Value ? reader.GetInt32(8) : 0);
-                        client.GenreId.GenderType = (!reader.IsDBNull(9) ? reader.GetString(9) : string.Empty);
+                                    Genre = new GenreME
+                                    {
+                                        GenreId = reader.IsDBNull(reader.GetOrdinal("GenreId")) ? 0 : reader.GetInt32(reader.GetOrdinal("GenreId")),
+                                        GenderType = reader.IsDBNull(reader.GetOrdinal("GenderType")) ? string.Empty : reader.GetString(reader.GetOrdinal("GenderType"))
+                                    },
 
-                        client.RelatId = new RelationShME();
-                        client.RelatId.RelationId = (reader.GetValue(10) != DBNull.Value ? reader.GetInt32(10) : 0);
-                        client.RelatId.RelationType = (!reader.IsDBNull(11) ? reader.GetString(11) : string.Empty);
+                                    Relation = new RelationShME
+                                    {
+                                        RelatId = reader.IsDBNull(reader.GetOrdinal("RelatId")) ? 0 : reader.GetInt32(reader.GetOrdinal("RelatId")),
+                                        RelationType = reader.IsDBNull(reader.GetOrdinal("RelationType")) ? string.Empty : reader.GetString(reader.GetOrdinal("RelationType"))
+                                    },
 
-                        client.Age = (reader.GetValue(12) != DBNull.Value ? reader.GetInt32(12) : 0);
-                        client.Birthday = (reader.GetValue(13) != DBNull.Value ? reader.GetDateTime(13) : DateTime.MinValue);
+                                    Age = reader.IsDBNull(reader.GetOrdinal("Age")) ? 0 : reader.GetInt32(reader.GetOrdinal("Age")),
+                                    Birthday = reader.IsDBNull(reader.GetOrdinal("Birthday")) ? DateTime.MinValue : reader.GetDateTime(reader.GetOrdinal("Birthday")),
+                                    UsuId = reader.IsDBNull(reader.GetOrdinal("UsuId")) ? 0 : reader.GetInt32(reader.GetOrdinal("UsuId"))
+                                };
 
-                        client.UsuId = (reader.GetValue(14) != DBNull.Value ? reader.GetInt32(14) : 0);
-
-                        clients.Add(client);
+                                clients.Add(client);
+                            }
+                        }
                     }
                 }
-
-                dbConnection.Close();
-                dbConnection.Dispose();
-
             }
-
+            catch (SqlException sqlEx)
+            {
+                Console.WriteLine($"SQL Error: {sqlEx.Message}");
+                foreach (SqlError error in sqlEx.Errors)
+                {
+                    Console.WriteLine($"Error Code: {error.Number}, Message: {error.Message}");
+                }
+            }
             catch (Exception ex)
             {
-                ex.Message.ToString();
+                Console.WriteLine($"General Error: {ex.Message}");
             }
 
             return clients;
-
         }
+
+
+
 
 
         public ClientME GetClientById(int id)
@@ -95,56 +110,62 @@ namespace DataAccess.DataAccessClients
 
             try
             {
-                SqlConnection dbConnection = DBConnection();
-                SqlCommand command = new SqlCommand("GET_CLIENT_BY_ID", dbConnection);
-                command.CommandType = System.Data.CommandType.StoredProcedure;
-                command.CommandTimeout = 9999;
-                command.Parameters.AddWithValue("@CLIENT_ID", id);
-
-                dbConnection.Open();
-
-                using (SqlDataReader reader = command.ExecuteReader())
+                using (SqlConnection dbConnection = DBConnection())
                 {
-                    while (reader.Read())
+                    using (SqlCommand command = new SqlCommand("[UVA].[SP_GET_CLIENT_BY_ID]", dbConnection))
                     {
-                        client.ClientId = (reader.GetValue(0) != DBNull.Value ? reader.GetInt32(0) : 0);
+                        command.CommandType = System.Data.CommandType.StoredProcedure;
+                        command.CommandTimeout = 9999;
+                        command.Parameters.AddWithValue("@ClientId", id);
 
-                        client.RolId = new RoleME();
-                        client.RolId.RolID = (reader.GetValue(1) != DBNull.Value ? reader.GetInt32(1) : 0);
-                        client.RolId.RolType = (!reader.IsDBNull(2) ? reader.GetString(2) : string.Empty);
+                        dbConnection.Open();
 
-                        client.Identification = new IdentificationME();
-                        client.Identification.IdentificationId = (reader.GetValue(3) != DBNull.Value ? reader.GetInt32(3) : 0);
-                        client.Identification.IdentificationType = (!reader.IsDBNull(4) ? reader.GetString(4) : string.Empty);
+                        using (SqlDataReader reader = command.ExecuteReader())
+                        {
+                            if (reader.Read())
+                            {
+                                client.ClientId = reader.GetValue(reader.GetOrdinal("ClientId")) != DBNull.Value ? reader.GetInt32(reader.GetOrdinal("ClientId")) : 0;
 
-                        client.IdentificationNumber = (!reader.IsDBNull(5) ? reader.GetString(5) : string.Empty);
+                                client.Role = new RoleME
+                                {
+                                    RolID = reader.IsDBNull(reader.GetOrdinal("RolID")) ? 0 : reader.GetInt32(reader.GetOrdinal("RolID")),
+                                    RolType = reader.IsDBNull(reader.GetOrdinal("RolType")) ? string.Empty : reader.GetString(reader.GetOrdinal("RolType"))
+                                };  // Cambiar a coma aquí
 
-                        client.ClientName = (!reader.IsDBNull(6) ? reader.GetString(6) : string.Empty);
-                        client.ClientLastName = (!reader.IsDBNull(7) ? reader.GetString(7) : string.Empty);
+                                client.Identification = new IdentificationME
+                                {
+                                    IdentificationId = reader.GetValue(reader.GetOrdinal("IdentificationId")) != DBNull.Value ? reader.GetInt32(reader.GetOrdinal("IdentificationId")) : 0,
+                                    IdentificationType = !reader.IsDBNull(reader.GetOrdinal("IdentificationType")) ? reader.GetString(reader.GetOrdinal("IdentificationType")) : string.Empty
+                                };
 
-                        client.GenreId = new GenreME();
-                        client.GenreId.GenderId = (reader.GetValue(8) != DBNull.Value ? reader.GetInt32(8) : 0);
-                        client.GenreId.GenderType = (!reader.IsDBNull(9) ? reader.GetString(9) : string.Empty);
+                                client.IdentificationNumber = !reader.IsDBNull(reader.GetOrdinal("IdentificationNumber")) ? reader.GetString(reader.GetOrdinal("IdentificationNumber")) : string.Empty;
 
-                        client.RelatId = new RelationShME();
-                        client.RelatId.RelationId = (reader.GetValue(10) != DBNull.Value ? reader.GetInt32(10) : 0);
-                        client.RelatId.RelationType = (!reader.IsDBNull(11) ? reader.GetString(11) : string.Empty);
+                                client.ClientName = !reader.IsDBNull(reader.GetOrdinal("ClientName")) ? reader.GetString(reader.GetOrdinal("ClientName")) : string.Empty;
+                                client.ClientLastName = !reader.IsDBNull(reader.GetOrdinal("ClientLastName")) ? reader.GetString(reader.GetOrdinal("ClientLastName")) : string.Empty;
 
-                        client.Age = (reader.GetValue(12) != DBNull.Value ? reader.GetInt32(12) : 0);
-                        client.Birthday = (reader.GetValue(13) != DBNull.Value ? reader.GetDateTime(13) : DateTime.MinValue);
+                                client.Genre = new GenreME
+                                {
+                                    GenreId = reader.IsDBNull(reader.GetOrdinal("GenreId")) ? 0 : reader.GetInt32(reader.GetOrdinal("GenreId")),
+                                    GenderType = !reader.IsDBNull(reader.GetOrdinal("GenderType")) ? reader.GetString(reader.GetOrdinal("GenderType")) : string.Empty
+                                };
 
-                        client.UsuId = (reader.GetValue(14) != DBNull.Value ? reader.GetInt32(14) : 0);
+                                client.Relation = new RelationShME
+                                {
+                                    RelatId = reader.GetValue(reader.GetOrdinal("RelatId")) != DBNull.Value ? reader.GetInt32(reader.GetOrdinal("RelatId")) : 0,
+                                    RelationType = !reader.IsDBNull(reader.GetOrdinal("RelationType")) ? reader.GetString(reader.GetOrdinal("RelationType")) : string.Empty // Asegúrate de que este nombre coincida con el de tu SP
+                                };
+
+                                client.Age = reader.GetValue(reader.GetOrdinal("Age")) != DBNull.Value ? reader.GetInt32(reader.GetOrdinal("Age")) : 0;
+                                client.Birthday = reader.GetValue(reader.GetOrdinal("Birthday")) != DBNull.Value ? reader.GetDateTime(reader.GetOrdinal("Birthday")) : DateTime.MinValue;
+                                client.UsuId = reader.GetValue(reader.GetOrdinal("UsuId")) != DBNull.Value ? reader.GetInt32(reader.GetOrdinal("UsuId")) : 0;
+                            }
+                        }
                     }
                 }
-
-                dbConnection.Close();
-                dbConnection.Dispose();
-
             }
-
             catch (Exception ex)
             {
-                ex.Message.ToString();
+                Console.WriteLine(ex.Message); // Manejo de excepciones
             }
 
             return client;
@@ -157,45 +178,50 @@ namespace DataAccess.DataAccessClients
 
             try
             {
+                // Calcular la edad antes de enviar al procedimiento almacenado
+                client.Age = client.CalculateAge();
+
                 using (SqlConnection dbConnection = DBConnection())
                 {
-                    SqlCommand command = new SqlCommand("CREATE_CLIENT", dbConnection);
+                    SqlCommand command = new SqlCommand("[UVA].[SP_CREATE_CLIENT]", dbConnection);
                     command.CommandType = System.Data.CommandType.StoredProcedure;
                     command.CommandTimeout = 9999;
 
                     dbConnection.Open();
 
-                    command.Parameters.AddWithValue("@USU_ID", client.UsuId);
-                    command.Parameters.AddWithValue("@IDENTI_ID", client.Identification?.IdentificationId ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@IDENTI_NUMBER", client.IdentificationNumber);
-                    command.Parameters.AddWithValue("@CLIENT_NAME", client.ClientName);
-                    command.Parameters.AddWithValue("@CLIENT_LAST_NAME", client.ClientLastName);
-                    command.Parameters.AddWithValue("@GENRE_ID", client.GenreId?.GenderId ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@RELAT_ID", client.RelatId?.RelationId ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@CLIENT_AGE", client.Age);
-                    command.Parameters.AddWithValue("@CLIENT_BIRTHDAY", client.ClientId);
+                    command.Parameters.AddWithValue("@UsuId", client.UsuId);
+                    command.Parameters.AddWithValue("@RoleId", client?.Role?.RolID ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@IdentificationId", client?.Identification?.IdentificationId ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@IdentificationNumber", client?.IdentificationNumber);
+                    command.Parameters.AddWithValue("@ClientName", client?.ClientName);
+                    command.Parameters.AddWithValue("@ClientLastName", client?.ClientLastName);
+                    command.Parameters.AddWithValue("@GenreId", client?.Genre?.GenreId ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@RelatId", client?.Relation?.RelatId ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@Age", client?.Age); // Usa la edad calculada
+                    command.Parameters.AddWithValue("@Birthday", client?.Birthday);
 
+                    // Ejecuta el comando
                     using (SqlDataReader dr = command.ExecuteReader())
                     {
-                        while (dr.Read())
+                        if (dr.Read())
                         {
-                            id = dr.GetInt32(0);
+                            id = Convert.ToInt32(dr["NewClientId"]);
                         }
                     }
 
                     dbConnection.Close();
-                    dbConnection.Dispose();
-
                 }
             }
-
             catch (Exception ex)
             {
-                ex.Message.ToString();
+                Console.WriteLine(ex.Message);
             }
 
             return id;
         }
+
+
+
 
 
         public int ModifyClient(ClientME client)
@@ -207,22 +233,22 @@ namespace DataAccess.DataAccessClients
             {
                 using (SqlConnection dbConnection = DBConnection())
                 {
-                    SqlCommand command = new SqlCommand("MODIFY_CLIENT", dbConnection);
+                    SqlCommand command = new SqlCommand("[UVA].[SP_UPDATE_CLIENT]", dbConnection);
                     command.CommandType = System.Data.CommandType.StoredProcedure;
                     command.CommandTimeout = 9999;
 
                     dbConnection.Open();
 
-                    command.Parameters.AddWithValue("@USU_ID", client.UsuId);
-                    command.Parameters.AddWithValue("@IDENTI_ID", client.Identification?.IdentificationId ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@IDENTI_NUMBER", client.IdentificationNumber);
-                    command.Parameters.AddWithValue("@CLIENT_NAME", client.ClientName);
-                    command.Parameters.AddWithValue("@CLIENT_LAST_NAME", client.ClientLastName);
-                    command.Parameters.AddWithValue("@GENRE_ID", client.GenreId?.GenderId ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@RELAT_ID", client.RelatId?.RelationId ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@CLIENT_AGE", client.Age);
-                    command.Parameters.AddWithValue("@CLIENT_BIRTHDAY", client.ClientId);
-                    command.Parameters.AddWithValue("@CLIENT_ID", client.ClientId);
+                    command.Parameters.AddWithValue("@UsuId", client.UsuId);
+                    command.Parameters.AddWithValue("@Identification", client.Identification?.IdentificationId ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@IdentificationNumber", client.IdentificationNumber);
+                    command.Parameters.AddWithValue("@ClientName", client.ClientName);
+                    command.Parameters.AddWithValue("@ClientLastName", client.ClientLastName);
+                    command.Parameters.AddWithValue("@GenreId", client.Genre?.GenreId ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@RelatId", client.Relation?.RelatId ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@Age", client.Age);
+                    command.Parameters.AddWithValue("@Birthday", client.ClientId);
+                    command.Parameters.AddWithValue("@ClientId", client.ClientId);
 
 
                     command.ExecuteNonQuery();
@@ -253,13 +279,13 @@ namespace DataAccess.DataAccessClients
             {
                 using (SqlConnection dbConnection = DBConnection())
                 {
-                    SqlCommand command = new SqlCommand("DELETE_CLIENT", dbConnection);
+                    SqlCommand command = new SqlCommand("[UVA].[SP_DELETE_CLIENT]", dbConnection);
                     command.CommandType = System.Data.CommandType.StoredProcedure;
                     command.CommandTimeout = 9999;
 
                     dbConnection.Open();
 
-                    command.Parameters.AddWithValue("@CLIENT_ID", id);
+                    command.Parameters.AddWithValue("@ClientId", id);
 
                     command.ExecuteNonQuery();
 

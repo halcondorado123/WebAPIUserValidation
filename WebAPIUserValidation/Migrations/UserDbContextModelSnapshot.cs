@@ -22,55 +22,68 @@ namespace APIUserValidation.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Models.ClientME", b =>
+            modelBuilder.Entity("ClientME", b =>
                 {
                     b.Property<int>("ClientId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("ClientId");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ClientId"));
 
                     b.Property<int>("Age")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("Age");
 
                     b.Property<DateTime>("Birthday")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("datetime2")
+                        .HasColumnName("Birthday");
 
                     b.Property<string>("ClientLastName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ClientLastName");
 
                     b.Property<string>("ClientName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("ClientName");
 
-                    b.Property<int?>("GenreIdGenderId")
-                        .HasColumnType("int");
+                    b.Property<int?>("GenreId")
+                        .HasColumnType("int")
+                        .HasColumnName("GenreId");
 
                     b.Property<int?>("IdentificationId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("IdentificationId");
 
                     b.Property<string>("IdentificationNumber")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("IdentificationNumber");
 
-                    b.Property<int?>("RelatIdRelationId")
-                        .HasColumnType("int");
+                    b.Property<int?>("RelatId")
+                        .HasColumnType("int")
+                        .HasColumnName("RelatId");
 
-                    b.Property<int?>("RolID")
-                        .HasColumnType("int");
+                    b.Property<int?>("RolId")
+                        .HasColumnType("int")
+                        .HasColumnName("RolId");
 
                     b.Property<int>("UsuId")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("UsuId");
 
                     b.HasKey("ClientId");
 
-                    b.HasIndex("GenreIdGenderId");
+                    b.HasIndex("GenreId");
 
                     b.HasIndex("IdentificationId");
 
-                    b.HasIndex("RelatIdRelationId");
+                    b.HasIndex("RelatId");
 
-                    b.HasIndex("RolID");
+                    b.HasIndex("RolId");
 
                     b.ToTable("ClientME", "UVA");
+
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("Models.GenreME", b =>
@@ -89,24 +102,6 @@ namespace APIUserValidation.Migrations
                     b.HasKey("GenderId");
 
                     b.ToTable("GenreME", "UVA");
-                });
-
-            modelBuilder.Entity("Models.IdClientME", b =>
-                {
-                    b.Property<int>("IdentyId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdentyId"));
-
-                    b.Property<string>("IdentiType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.HasKey("IdentyId");
-
-                    b.ToTable("IdClientME", "UVA");
                 });
 
             modelBuilder.Entity("Models.IdentificationME", b =>
@@ -165,65 +160,56 @@ namespace APIUserValidation.Migrations
 
             modelBuilder.Entity("Models.UserInfoME", b =>
                 {
-                    b.Property<int>("UsuId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UsuId"));
+                    b.HasBaseType("ClientME");
 
                     b.Property<string>("UserName")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("UserName");
 
                     b.Property<string>("UserPassword")
                         .IsRequired()
-                        .HasColumnType("varchar(200)");
-
-                    b.Property<int?>("UsuClientClientId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UsuId");
-
-                    b.HasIndex("UsuClientClientId");
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("UserPassword");
 
                     b.ToTable("UserInfo", "UVA");
                 });
 
-            modelBuilder.Entity("Models.ClientME", b =>
+            modelBuilder.Entity("ClientME", b =>
                 {
-                    b.HasOne("Models.GenreME", "GenreId")
+                    b.HasOne("Models.GenreME", "Genre")
                         .WithMany()
-                        .HasForeignKey("GenreIdGenderId");
+                        .HasForeignKey("GenreId");
 
                     b.HasOne("Models.IdentificationME", "Identification")
                         .WithMany()
                         .HasForeignKey("IdentificationId");
 
-                    b.HasOne("Models.RelationShME", "RelatId")
+                    b.HasOne("Models.RelationShME", "Relation")
                         .WithMany()
-                        .HasForeignKey("RelatIdRelationId");
+                        .HasForeignKey("RelatId");
 
-                    b.HasOne("Models.RoleME", "RolId")
+                    b.HasOne("Models.RoleME", "Role")
                         .WithMany()
-                        .HasForeignKey("RolID");
+                        .HasForeignKey("RolId");
 
-                    b.Navigation("GenreId");
+                    b.Navigation("Genre");
 
                     b.Navigation("Identification");
 
-                    b.Navigation("RelatId");
+                    b.Navigation("Relation");
 
-                    b.Navigation("RolId");
+                    b.Navigation("Role");
                 });
 
             modelBuilder.Entity("Models.UserInfoME", b =>
                 {
-                    b.HasOne("Models.ClientME", "UsuClient")
-                        .WithMany()
-                        .HasForeignKey("UsuClientClientId");
-
-                    b.Navigation("UsuClient");
+                    b.HasOne("ClientME", null)
+                        .WithOne()
+                        .HasForeignKey("Models.UserInfoME", "ClientId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

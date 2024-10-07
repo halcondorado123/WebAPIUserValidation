@@ -2,6 +2,7 @@ using DataAccess;
 using DataAccess.DataAccessClients;
 using DataAccess.DataAccessUsers;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
@@ -11,6 +12,10 @@ var builder = WebApplication.CreateBuilder(args);
 // Configuración de servicios
 builder.Services.AddCors();
 builder.Services.AddSingleton(new ConfigurationData(builder.Configuration.GetConnectionString("SQLConnection")));
+
+builder.Services.AddDbContext<UserDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("SQLConnection"),
+        b => b.MigrationsAssembly("APIUserValidation"))); // Cambia "APIUserValidation" por el nombre de tu proyecto
 
 builder.Services.AddScoped<IClientsRepository, ClientsRepository>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();

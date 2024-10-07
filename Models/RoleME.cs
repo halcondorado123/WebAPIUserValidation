@@ -12,11 +12,12 @@ namespace Models
     public class RoleME
     {
         [Key]
+        [Column("RolID")]
         public int RolID { get; set; }
 
         [Required]
         [MaxLength(100)]
-        [Column(TypeName = "varchar(100)")] // Especifica el tipo de datos en la base de datos
+        [Column("RolType", TypeName = "varchar(100)")] // Especifica el tipo de datos en la base de datos
         public string? RolType { get; set; }
     }
 }

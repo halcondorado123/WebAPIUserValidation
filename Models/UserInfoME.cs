@@ -13,12 +13,13 @@ namespace Models
     {
         [Required]
         [MaxLength(100)]
-        [Column(TypeName = "varchar(100)")] // Especifica el tipo de datos en la base de datos
+        [Column("UserName", TypeName = "varchar(100)")] // Combina los dos atributos en uno
         public string? UserName { get; set; }
-        
+
         // Almacena el hash de la contraseña
         [Required]
-        [Column(TypeName = "varchar(200)")]
+        [Column("UserPassword", TypeName = "varchar(200)")] // Combina aquí también
         public string? UserPassword { get; set; }
     }
+
 }
