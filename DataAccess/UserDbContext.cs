@@ -6,9 +6,6 @@ namespace DataAccess
     public class UserDbContext : DbContext
     {
         public UserDbContext(DbContextOptions<UserDbContext> options) : base(options) { }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder) { }
-
         public DbSet<ClientME>? Client { get; set; }
         public DbSet<GenreME>? Gender { get; set; }
         public DbSet<IdentificationME>? Identification { get; set; }
@@ -16,5 +13,34 @@ namespace DataAccess
         public DbSet<RelationShME>? Relationship { get; set; }
         public DbSet<RoleME>? Role { get; set; }
         public DbSet<UserInfoME>? UserInfo { get; set; }
+
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+
+            modelBuilder.Entity<ClientME>()
+           .Property(e => e.ClientId)
+           .ValueGeneratedOnAdd(); // Esto asegura que se genere automáticamente
+
+            modelBuilder.Entity<GenreME>()
+           .Property(e => e.GenreId)
+           .ValueGeneratedOnAdd(); // Esto asegura que se genere automáticamente
+
+            modelBuilder.Entity<IdentificationME>()
+           .Property(e => e.IdentificationId)
+           .ValueGeneratedOnAdd(); // Esto asegura que se genere automáticamente
+
+            modelBuilder.Entity<RelationShME>()
+           .Property(e => e.RelatId)
+           .ValueGeneratedOnAdd(); // Esto asegura que se genere automáticamente
+
+            modelBuilder.Entity<RoleME>()
+           .Property(e => e.RolID)
+           .ValueGeneratedOnAdd(); // Esto asegura que se genere automáticamente
+
+        }
+
     }
+
+
 }

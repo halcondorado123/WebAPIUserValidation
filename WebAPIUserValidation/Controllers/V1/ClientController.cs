@@ -1,9 +1,11 @@
-﻿using DataAccess;
+﻿using APIUserValidation.Helpers;
+using DataAccess;
 using DataAccess.DataAccessClients;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models;
 using Models.TokenME;
+using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Security.Claims;
 
@@ -34,7 +36,11 @@ namespace APIUserValidation.Controllers.V1
             }
         }
 
-        [HttpGet]
+        [HttpGet("GetClients")]
+        [SwaggerOperation(
+        Summary = SwaggerComments.Clients.GetAllUsersSummary,
+        Description = SwaggerComments.Clients.GetAllUsersDescription)]
+
         public ActionResult GetClients()
         {
             try
@@ -49,7 +55,10 @@ namespace APIUserValidation.Controllers.V1
             }
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("GetClientByID{id}")]
+        [SwaggerOperation(
+        Summary = SwaggerComments.Clients.GetUserByIdSummary,
+        Description = SwaggerComments.Clients.GetUserByIdDescription)]
         public ActionResult GetClientById(int id)
         {
             try
@@ -66,7 +75,10 @@ namespace APIUserValidation.Controllers.V1
             }
         }
 
-        [HttpPost]
+        [HttpPost("CreateClient")]
+        [SwaggerOperation(
+        Summary = SwaggerComments.Clients.CreateUserSummary,
+        Description = SwaggerComments.Clients.CreateUserDescription)]
         public ActionResult CreateClient([FromBody] ClientME client)
         {
             try
@@ -81,7 +93,11 @@ namespace APIUserValidation.Controllers.V1
             }
         }
 
-        [HttpPut]
+
+        [HttpPut("ModifyClient")]
+        [SwaggerOperation(
+        Summary = SwaggerComments.Clients.UpdateUserSummary,
+        Description = SwaggerComments.Clients.UpdateUserDescription)]
         public ActionResult ModifyClient([FromBody] ClientME client)
         {
             try
@@ -96,7 +112,10 @@ namespace APIUserValidation.Controllers.V1
             }
         }
 
-        [HttpDelete("{id}")]
+        [HttpDelete("DeleteClient{id}")]
+        [SwaggerOperation(
+        Summary = SwaggerComments.Clients.DeleteUserSummary,
+        Description = SwaggerComments.Clients.DeleteUserDescription)]
         public ActionResult DeleteClient(int id)
         {
             try

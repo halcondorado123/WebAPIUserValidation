@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace APIUserValidation.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class initialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -19,13 +19,13 @@ namespace APIUserValidation.Migrations
                 schema: "UVA",
                 columns: table => new
                 {
-                    GenderId = table.Column<int>(type: "int", nullable: false)
+                    GenreId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     GenderType = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GenreME", x => x.GenderId);
+                    table.PrimaryKey("PK_GenreME", x => x.GenreId);
                 });
 
             migrationBuilder.CreateTable(
@@ -47,13 +47,13 @@ namespace APIUserValidation.Migrations
                 schema: "UVA",
                 columns: table => new
                 {
-                    RelationId = table.Column<int>(type: "int", nullable: false)
+                    RelatId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RelationType = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RelationShME", x => x.RelationId);
+                    table.PrimaryKey("PK_RelationShME", x => x.RelatId);
                 });
 
             migrationBuilder.CreateTable(
@@ -96,7 +96,7 @@ namespace APIUserValidation.Migrations
                         column: x => x.GenreId,
                         principalSchema: "UVA",
                         principalTable: "GenreME",
-                        principalColumn: "GenderId");
+                        principalColumn: "GenreId");
                     table.ForeignKey(
                         name: "FK_ClientME_IdentificationME_IdentificationId",
                         column: x => x.IdentificationId,
@@ -108,7 +108,7 @@ namespace APIUserValidation.Migrations
                         column: x => x.RelatId,
                         principalSchema: "UVA",
                         principalTable: "RelationShME",
-                        principalColumn: "RelationId");
+                        principalColumn: "RelatId");
                     table.ForeignKey(
                         name: "FK_ClientME_RoleME_RolId",
                         column: x => x.RolId,

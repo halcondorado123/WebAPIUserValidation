@@ -1,24 +1,29 @@
 ﻿using Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 [Table("ClientME", Schema = "UVA")]
 public class ClientME
 {
     [Key]
     [Column("ClientId")] // Nombre exacto en SQL
+    [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int ClientId { get; set; }
 
+    //[JsonIgnore]
     //[Column("RolId")] // Nombre exacto en SQL
-    //public int? RolId { get; set; }
+    public int? RolId { get; set; }
 
     [ForeignKey("RolId")]
     public RoleME? Role { get; set; } // Propiedad de navegación
 
+    //[JsonIgnore]
     //[Column("IdentificationId")] // Nombre exacto en SQL
-    //public int? IdentificationId { get; set; }
+    public int? IdentificationId { get; set; }
 
-    [ForeignKey("Identification")]
+    // Cambiar el ForeignKey para que apunte a IdentificationId
+    [ForeignKey("IdentificationId")]
     public IdentificationME? Identification { get; set; }
 
     [Column("IdentificationNumber")] // Nombre exacto en SQL
@@ -30,12 +35,14 @@ public class ClientME
     [Column("ClientLastName")] // Nombre exacto en SQL
     public string? ClientLastName { get; set; }
 
+    //[JsonIgnore]
     //[Column("GenreId")] // Nombre exacto en SQL
-    //public int? GenreId { get; set; }
+    public int? GenreId { get; set; }
 
     [ForeignKey("GenreId")]
     public GenreME? Genre { get; set; }
 
+    //[JsonIgnore]
     //[Column("RelatId")] // Nombre exacto en SQL
     //public int? RelatId { get; set; }
 

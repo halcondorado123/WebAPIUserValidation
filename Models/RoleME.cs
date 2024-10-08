@@ -13,6 +13,7 @@ namespace Models
     {
         [Key]
         [Column("RolID")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int RolID { get; set; }
 
         [Required]

@@ -48,24 +48,20 @@ namespace APIUserValidation.Migrations
                         .HasColumnName("ClientName");
 
                     b.Property<int?>("GenreId")
-                        .HasColumnType("int")
-                        .HasColumnName("GenreId");
+                        .HasColumnType("int");
 
                     b.Property<int?>("IdentificationId")
-                        .HasColumnType("int")
-                        .HasColumnName("IdentificationId");
+                        .HasColumnType("int");
 
                     b.Property<string>("IdentificationNumber")
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("IdentificationNumber");
 
                     b.Property<int?>("RelatId")
-                        .HasColumnType("int")
-                        .HasColumnName("RelatId");
+                        .HasColumnType("int");
 
                     b.Property<int?>("RolId")
-                        .HasColumnType("int")
-                        .HasColumnName("RolId");
+                        .HasColumnType("int");
 
                     b.Property<int>("UsuId")
                         .HasColumnType("int")
@@ -88,18 +84,20 @@ namespace APIUserValidation.Migrations
 
             modelBuilder.Entity("Models.GenreME", b =>
                 {
-                    b.Property<int>("GenderId")
+                    b.Property<int>("GenreId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("GenreId");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GenderId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GenreId"));
 
                     b.Property<string>("GenderType")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("GenderType");
 
-                    b.HasKey("GenderId");
+                    b.HasKey("GenreId");
 
                     b.ToTable("GenreME", "UVA");
                 });
@@ -108,7 +106,8 @@ namespace APIUserValidation.Migrations
                 {
                     b.Property<int>("IdentificationId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("IdentificationId");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdentificationId"));
 
@@ -124,18 +123,20 @@ namespace APIUserValidation.Migrations
 
             modelBuilder.Entity("Models.RelationShME", b =>
                 {
-                    b.Property<int>("RelationId")
+                    b.Property<int>("RelatId")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("RelatId");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RelationId"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RelatId"));
 
                     b.Property<string>("RelationType")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("RelationType");
 
-                    b.HasKey("RelationId");
+                    b.HasKey("RelatId");
 
                     b.ToTable("RelationShME", "UVA");
                 });
@@ -144,14 +145,16 @@ namespace APIUserValidation.Migrations
                 {
                     b.Property<int>("RolID")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("RolID");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RolID"));
 
                     b.Property<string>("RolType")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("RolType");
 
                     b.HasKey("RolID");
 

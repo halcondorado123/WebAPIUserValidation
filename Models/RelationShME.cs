@@ -12,7 +12,8 @@ namespace Models
     public class RelationShME
     {
         [Key]
-        [Column("[RelatId]")]
+        [Column("RelatId")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int RelatId { get; set; }
 
         [Required]

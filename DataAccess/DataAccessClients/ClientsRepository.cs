@@ -1,11 +1,14 @@
 ﻿using Microsoft.Data.SqlClient;
 using Models;
+using Models.ApiModel;
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Data.Common;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 
 namespace DataAccess.DataAccessClients
 {
@@ -125,13 +128,14 @@ namespace DataAccess.DataAccessClients
                             if (reader.Read())
                             {
                                 client.ClientId = reader.GetValue(reader.GetOrdinal("ClientId")) != DBNull.Value ? reader.GetInt32(reader.GetOrdinal("ClientId")) : 0;
-
+                                client.RolId = reader.GetValue(reader.GetOrdinal("ClientId")) != DBNull.Value ? reader.GetInt32(reader.GetOrdinal("ClientId")) : 0;
                                 client.Role = new RoleME
                                 {
                                     RolID = reader.IsDBNull(reader.GetOrdinal("RolID")) ? 0 : reader.GetInt32(reader.GetOrdinal("RolID")),
                                     RolType = reader.IsDBNull(reader.GetOrdinal("RolType")) ? string.Empty : reader.GetString(reader.GetOrdinal("RolType"))
                                 };  // Cambiar a coma aquí
 
+                                //client.IdentificationId = reader.GetValue(reader.GetOrdinal("ClientId")) != DBNull.Value ? reader.GetInt32(reader.GetOrdinal("ClientId")) : 0;
                                 client.Identification = new IdentificationME
                                 {
                                     IdentificationId = reader.GetValue(reader.GetOrdinal("IdentificationId")) != DBNull.Value ? reader.GetInt32(reader.GetOrdinal("IdentificationId")) : 0,
@@ -143,12 +147,14 @@ namespace DataAccess.DataAccessClients
                                 client.ClientName = !reader.IsDBNull(reader.GetOrdinal("ClientName")) ? reader.GetString(reader.GetOrdinal("ClientName")) : string.Empty;
                                 client.ClientLastName = !reader.IsDBNull(reader.GetOrdinal("ClientLastName")) ? reader.GetString(reader.GetOrdinal("ClientLastName")) : string.Empty;
 
+                                //client.GenreId = reader.GetValue(reader.GetOrdinal("ClientId")) != DBNull.Value ? reader.GetInt32(reader.GetOrdinal("ClientId")) : 0;
                                 client.Genre = new GenreME
                                 {
                                     GenreId = reader.IsDBNull(reader.GetOrdinal("GenreId")) ? 0 : reader.GetInt32(reader.GetOrdinal("GenreId")),
                                     GenderType = !reader.IsDBNull(reader.GetOrdinal("GenderType")) ? reader.GetString(reader.GetOrdinal("GenderType")) : string.Empty
                                 };
 
+                                //client.RelatId = reader.GetValue(reader.GetOrdinal("ClientId")) != DBNull.Value ? reader.GetInt32(reader.GetOrdinal("ClientId")) : 0;
                                 client.Relation = new RelationShME
                                 {
                                     RelatId = reader.GetValue(reader.GetOrdinal("RelatId")) != DBNull.Value ? reader.GetInt32(reader.GetOrdinal("RelatId")) : 0,
@@ -172,26 +178,110 @@ namespace DataAccess.DataAccessClients
         }
 
 
-        public int CreateClient(ClientME client)
+        public ApiResponse CreateClient(ClientME client)
         {
+            ApiResponse response = new ApiResponse();
             int id = 0;
+
+            // Inicializar la conexión a la base de datos
+            using (SqlConnection dbConnection = DBConnection()) // Asegúrate de que este método devuelva una conexión válida
+            {
+                try
+                {
+                    // Calcular la edad antes de enviar al procedimiento almacenado
+                    client.Age = client.CalculateAge();
+
+                    using (SqlCommand command = new SqlCommand("[UVA].[SP_UPDATE_CLIENT]", dbConnection))
+                    {
+                        command.CommandType = System.Data.CommandType.StoredProcedure;
+                        command.CommandTimeout = 9999;
+
+                        dbConnection.Open();
+
+                        // Agregar el parámetro faltante de ClientId para la actualización
+                        command.Parameters.AddWithValue("@ClientId", client.ClientId);
+
+                        command.Parameters.AddWithValue("@UsuId", client.UsuId);
+                        command.Parameters.AddWithValue("@RoleId", client?.Role?.RolID ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue("@IdentificationId", client?.Identification?.IdentificationId ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue("@IdentificationNumber", client?.IdentificationNumber);
+                        command.Parameters.AddWithValue("@ClientName", client?.ClientName);
+                        command.Parameters.AddWithValue("@ClientLastName", client?.ClientLastName);
+                        command.Parameters.AddWithValue("@GenreId", client?.Genre?.GenreId ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue("@RelatId", client?.Relation?.RelatId ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue("@Age", client?.Age); // Usa la edad calculada
+                        command.Parameters.AddWithValue("@Birthday", client?.Birthday);
+
+                        // Ejecuta el comando
+                        using (SqlDataReader dr = command.ExecuteReader())
+                        {
+                            if (dr.Read())
+                            {
+                                // Puedes retornar el ID del cliente si lo necesitas
+                                id = Convert.ToInt32(dr["NewClientId"]);
+                            }
+                        }
+
+                        // Establecer la respuesta como exitosa
+                        response.Status = 200;
+                        response.Message = "Cliente actualizado con éxito.";
+                    }
+                }
+                catch (SqlException ex)
+                {
+                    // Manejo de errores SQL
+                    response.Status = 500; // Indicar error interno del servidor
+                    response.Message = $"Error SQL: {ex.Message}";
+                }
+                catch (Exception ex)
+                {
+                    // Manejo de otros errores
+                    response.Status = 500; // Indicar error interno del servidor
+                    response.Message = $"Error: {ex.Message}";
+                }
+                finally
+                {
+                    // Cerrar la conexión si está abierta
+                    if (dbConnection != null)
+                    {
+                        dbConnection.Close();
+                        dbConnection.Dispose();
+                    }
+                }
+            }
+
+            return response;
+        }
+
+
+
+
+
+
+
+        public ApiResponse ModifyClient(ClientME client)
+        {
+
+            ApiResponse response = new ApiResponse();
+            SqlConnection? dbConnection = null;
+
 
             try
             {
-                // Calcular la edad antes de enviar al procedimiento almacenado
-                client.Age = client.CalculateAge();
+                dbConnection = DBConnection();
 
-                using (SqlConnection dbConnection = DBConnection())
+
+                using (SqlCommand command = new SqlCommand("[UVA].[SP_UPDATE_CLIENT]", dbConnection))
                 {
-                    SqlCommand command = new SqlCommand("[UVA].[SP_CREATE_CLIENT]", dbConnection);
                     command.CommandType = System.Data.CommandType.StoredProcedure;
                     command.CommandTimeout = 9999;
 
                     dbConnection.Open();
 
-                    command.Parameters.AddWithValue("@UsuId", client.UsuId);
+                    client.Age = client.CalculateAge();
+                    command.Parameters.AddWithValue("@ClientId", client.ClientId);
                     command.Parameters.AddWithValue("@RoleId", client?.Role?.RolID ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@IdentificationId", client?.Identification?.IdentificationId ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@Identification", client?.Identification?.IdentificationId ?? (object)DBNull.Value);
                     command.Parameters.AddWithValue("@IdentificationNumber", client?.IdentificationNumber);
                     command.Parameters.AddWithValue("@ClientName", client?.ClientName);
                     command.Parameters.AddWithValue("@ClientLastName", client?.ClientLastName);
@@ -199,111 +289,89 @@ namespace DataAccess.DataAccessClients
                     command.Parameters.AddWithValue("@RelatId", client?.Relation?.RelatId ?? (object)DBNull.Value);
                     command.Parameters.AddWithValue("@Age", client?.Age); // Usa la edad calculada
                     command.Parameters.AddWithValue("@Birthday", client?.Birthday);
-
-                    // Ejecuta el comando
-                    using (SqlDataReader dr = command.ExecuteReader())
-                    {
-                        if (dr.Read())
-                        {
-                            id = Convert.ToInt32(dr["NewClientId"]);
-                        }
-                    }
-
-                    dbConnection.Close();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
-            return id;
-        }
-
-
-
-
-
-        public int ModifyClient(ClientME client)
-        {
-
-            int UpdateUser = 0;
-
-            try
-            {
-                using (SqlConnection dbConnection = DBConnection())
-                {
-                    SqlCommand command = new SqlCommand("[UVA].[SP_UPDATE_CLIENT]", dbConnection);
-                    command.CommandType = System.Data.CommandType.StoredProcedure;
-                    command.CommandTimeout = 9999;
-
-                    dbConnection.Open();
-
-                    command.Parameters.AddWithValue("@UsuId", client.UsuId);
-                    command.Parameters.AddWithValue("@Identification", client.Identification?.IdentificationId ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@IdentificationNumber", client.IdentificationNumber);
-                    command.Parameters.AddWithValue("@ClientName", client.ClientName);
-                    command.Parameters.AddWithValue("@ClientLastName", client.ClientLastName);
-                    command.Parameters.AddWithValue("@GenreId", client.Genre?.GenreId ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@RelatId", client.Relation?.RelatId ?? (object)DBNull.Value);
-                    command.Parameters.AddWithValue("@Age", client.Age);
-                    command.Parameters.AddWithValue("@Birthday", client.ClientId);
-                    command.Parameters.AddWithValue("@ClientId", client.ClientId);
-
+                    command.Parameters.AddWithValue("@UsuId", client?.UsuId);
 
                     command.ExecuteNonQuery();
 
-                    UpdateUser = 1;
+                    response.Status = 200;
+                    response.Message = "Cliente actualizado con éxito.";
 
+                }
+            }
+
+            catch (SqlException ex)
+            {
+                // Manejo de errores SQL
+                response.Status = 500; // Indicar error interno del servidor
+                response.Message = $"Error SQL: {ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                // Manejo de otros errores
+                response.Status = 500; // Indicar error interno del servidor
+                response.Message = $"Error: {ex.Message}";
+            }
+            finally
+            {
+                // Cerrar la conexión si está abierta
+                if (dbConnection != null)
+                {
                     dbConnection.Close();
                     dbConnection.Dispose();
                 }
             }
 
-            catch (Exception ex)
-            {
-                ex.Message.ToString();
-            }
-
-            return UpdateUser;
+            return response;
 
         }
 
 
-        public int DeleteClient(int id)
+        public ApiResponse DeleteClient(int id)
         {
+            ApiResponse response = new ApiResponse();
 
-            int ValidateDelete = 0;
+            SqlConnection dbConnection = null;
 
             try
             {
-                using (SqlConnection dbConnection = DBConnection())
+                dbConnection = DBConnection();
+                using (SqlCommand command = new SqlCommand("[UVA].[SP_DELETE_CLIENT]", dbConnection))
                 {
-                    SqlCommand command = new SqlCommand("[UVA].[SP_DELETE_CLIENT]", dbConnection);
                     command.CommandType = System.Data.CommandType.StoredProcedure;
                     command.CommandTimeout = 9999;
-
-                    dbConnection.Open();
 
                     command.Parameters.AddWithValue("@ClientId", id);
 
+                    dbConnection.Open();
+
+                    // Ejecutar el procedimiento almacenado
                     command.ExecuteNonQuery();
 
-                    ValidateDelete = 1;
-
+                    response.Status = 200;
+                    response.Message = "Cliente eliminado con éxito.";
+                }
+            }
+            catch (SqlException ex)
+            {
+                response.Status = 500;
+                response.Message = $"Error SQL: {ex.Message}";
+            }
+            catch (Exception ex)
+            {
+                response.Status = 500;
+                response.Message = $"Error: {ex.Message}";
+            }
+            finally
+            {
+                // Cerrar la conexión si está abierta
+                if (dbConnection != null)
+                {
                     dbConnection.Close();
                     dbConnection.Dispose();
                 }
             }
 
-            catch (Exception ex)
-            {
-                ex.Message.ToString();
-            }
-
-            return ValidateDelete;
-
+            return response;
         }
-
     }
 }

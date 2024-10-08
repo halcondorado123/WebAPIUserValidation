@@ -7,7 +7,8 @@ namespace Models
     public class GenreME
     {
         [Key]
-        [Column("[GenreId]")]
+        [Column("GenreId")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int GenreId { get; set; }
 
         [Required]

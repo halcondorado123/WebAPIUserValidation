@@ -12,6 +12,8 @@ namespace Models
     public class IdentificationME
     {
         [Key]
+        [Column("IdentificationId")]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int IdentificationId { get; set; }
 
         [Required]

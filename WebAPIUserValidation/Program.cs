@@ -26,6 +26,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+    c.EnableAnnotations(); // Habilitar anotaciones
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "ProjUserValidation", Version = "v1" });
 });
 

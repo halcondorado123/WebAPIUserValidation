@@ -1,4 +1,5 @@
 ﻿using Models;
+using Models.ApiModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +12,8 @@ namespace DataAccess.DataAccessClients
     {
         List<ClientME> GetClients();
         ClientME GetClientById(int id);
-        int CreateClient(ClientME client);
-        int ModifyClient(ClientME client);
-        int DeleteClient(int id);
+        ApiResponse CreateClient(ClientME client);
+        ApiResponse ModifyClient(ClientME client);
+        ApiResponse DeleteClient(int id);
     }
 }
