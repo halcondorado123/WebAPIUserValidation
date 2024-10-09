@@ -1,4 +1,5 @@
-﻿using Microsoft.Data.SqlClient;
+﻿using Azure;
+using Microsoft.Data.SqlClient;
 using Models;
 using Models.ApiModel;
 using System;
@@ -28,17 +29,20 @@ namespace DataAccess.DataAccessClients
 
         public List<ClientME> GetClients()
         {
+            ApiResponse response = new ApiResponse();
             List<ClientME> clients = new List<ClientME>();
 
             try
             {
-                using (SqlConnection dbConnection = DBConnection())
+                // Inicializar la conexión a la base de datos
+                using (SqlConnection dbConnection = DBConnection()) // Asegúrate de que este método devuelva una conexión válida
                 {
                     using (SqlCommand command = new SqlCommand("[UVA].[SP_GET_CLIENTS]", dbConnection))
                     {
+                        command.CommandType = System.Data.CommandType.StoredProcedure;
                         command.CommandTimeout = 9999;
 
-                        dbConnection.Open();
+                        dbConnection.Open(); // Abrir la conexión
 
                         using (SqlDataReader reader = command.ExecuteReader())
                         {
@@ -52,7 +56,7 @@ namespace DataAccess.DataAccessClients
                                     {
                                         RolID = reader.IsDBNull(reader.GetOrdinal("RolID")) ? 0 : reader.GetInt32(reader.GetOrdinal("RolID")),
                                         RolType = reader.IsDBNull(reader.GetOrdinal("RolType")) ? string.Empty : reader.GetString(reader.GetOrdinal("RolType"))
-                                    },  // Cambiar a coma aquí
+                                    },
 
                                     Identification = new IdentificationME
                                     {
@@ -87,25 +91,21 @@ namespace DataAccess.DataAccessClients
                     }
                 }
             }
-            catch (SqlException sqlEx)
+            catch (SqlException ex)
             {
-                Console.WriteLine($"SQL Error: {sqlEx.Message}");
-                foreach (SqlError error in sqlEx.Errors)
-                {
-                    Console.WriteLine($"Error Code: {error.Number}, Message: {error.Message}");
-                }
+                // Manejo de errores SQL
+                response.Status = 500; // Indicar error interno del servidor
+                response.Message = $"Error SQL: {ex.Message}";
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"General Error: {ex.Message}");
+                // Manejo de otros errores
+                response.Status = 500; // Indicar error interno del servidor
+                response.Message = $"Error: {ex.Message}";
             }
 
             return clients;
         }
-
-
-
-
 
         public ClientME GetClientById(int id)
         {
@@ -169,9 +169,17 @@ namespace DataAccess.DataAccessClients
                     }
                 }
             }
+            catch (SqlException sqlEx)
+            {
+                Console.WriteLine($"SQL Error: {sqlEx.Message}");
+                foreach (SqlError error in sqlEx.Errors)
+                {
+                    Console.WriteLine($"Error Code: {error.Number}, Message: {error.Message}");
+                }
+            }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message); // Manejo de excepciones
+                Console.WriteLine($"General Error: {ex.Message}");
             }
 
             return client;
@@ -191,16 +199,15 @@ namespace DataAccess.DataAccessClients
                     // Calcular la edad antes de enviar al procedimiento almacenado
                     client.Age = client.CalculateAge();
 
-                    using (SqlCommand command = new SqlCommand("[UVA].[SP_UPDATE_CLIENT]", dbConnection))
+                    using (SqlCommand command = new SqlCommand("[UVA].[SP_CREATE_CLIENT]", dbConnection))
                     {
                         command.CommandType = System.Data.CommandType.StoredProcedure;
                         command.CommandTimeout = 9999;
 
                         dbConnection.Open();
 
-                        // Agregar el parámetro faltante de ClientId para la actualización
-                        command.Parameters.AddWithValue("@ClientId", client.ClientId);
-
+                        //// Agregar el parámetro faltante de ClientId para la actualización
+                        //command.Parameters.AddWithValue("@ClientId", client.ClientId);
                         command.Parameters.AddWithValue("@UsuId", client.UsuId);
                         command.Parameters.AddWithValue("@RoleId", client?.Role?.RolID ?? (object)DBNull.Value);
                         command.Parameters.AddWithValue("@IdentificationId", client?.Identification?.IdentificationId ?? (object)DBNull.Value);
@@ -224,7 +231,7 @@ namespace DataAccess.DataAccessClients
 
                         // Establecer la respuesta como exitosa
                         response.Status = 200;
-                        response.Message = "Cliente actualizado con éxito.";
+                        response.Message = "Cliente creado con éxito.";
                     }
                 }
                 catch (SqlException ex)
@@ -253,18 +260,11 @@ namespace DataAccess.DataAccessClients
             return response;
         }
 
-
-
-
-
-
-
         public ApiResponse ModifyClient(ClientME client)
         {
 
             ApiResponse response = new ApiResponse();
             SqlConnection? dbConnection = null;
-
 
             try
             {
@@ -324,7 +324,6 @@ namespace DataAccess.DataAccessClients
             return response;
 
         }
-
 
         public ApiResponse DeleteClient(int id)
         {

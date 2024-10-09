@@ -11,15 +11,15 @@ public class ClientME
     [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
     public int ClientId { get; set; }
 
-    //[JsonIgnore]
-    //[Column("RolId")] // Nombre exacto en SQL
+    [JsonIgnore]
+    [Column("RolId")] // Nombre exacto en SQL
     public int? RolId { get; set; }
 
     [ForeignKey("RolId")]
     public RoleME? Role { get; set; } // Propiedad de navegación
 
-    //[JsonIgnore]
-    //[Column("IdentificationId")] // Nombre exacto en SQL
+    [JsonIgnore]
+    [Column("IdentificationId")] // Nombre exacto en SQL
     public int? IdentificationId { get; set; }
 
     // Cambiar el ForeignKey para que apunte a IdentificationId
@@ -35,16 +35,16 @@ public class ClientME
     [Column("ClientLastName")] // Nombre exacto en SQL
     public string? ClientLastName { get; set; }
 
-    //[JsonIgnore]
-    //[Column("GenreId")] // Nombre exacto en SQL
+    [JsonIgnore]
+    [Column("GenreId")] // Nombre exacto en SQL
     public int? GenreId { get; set; }
 
     [ForeignKey("GenreId")]
     public GenreME? Genre { get; set; }
 
-    //[JsonIgnore]
-    //[Column("RelatId")] // Nombre exacto en SQL
-    //public int? RelatId { get; set; }
+    [JsonIgnore]
+    [Column("RelatId")] // Nombre exacto en SQL
+    public int? RelatId { get; set; }
 
     [ForeignKey("RelatId")]
     public RelationShME? Relation { get; set; }
