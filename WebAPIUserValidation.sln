@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34309.116
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "APIUserValidation", "WebAPIUserValidation\APIUserValidation.csproj", "{10F11991-A879-4E7F-8A39-00EEA5F0C275}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "APIUserValidation", "WebAPIUserValidation\APIUserValidation.csproj", "{10F11991-A879-4E7F-8A39-00EEA5F0C275}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Data", "Data", "{4DF8D04D-27CA-40FE-8988-AA54A9A459E1}"
 EndProject
@@ -11,9 +11,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Model", "Model", "{185D7477
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Service", "Service", "{4AE9DBCE-8C9D-4BD4-BFB5-E36AD68D3282}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataAccess", "DataAccess\DataAccess.csproj", "{5C251AE2-7C69-4692-96F6-6451C739E52E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataAccess", "DataAccess\DataAccess.csproj", "{5C251AE2-7C69-4692-96F6-6451C739E52E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Models", "Models\Models.csproj", "{4A2CF7EB-012A-4961-A9BD-7DC5EC4886E0}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "Models\Models.csproj", "{4A2CF7EB-012A-4961-A9BD-7DC5EC4886E0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,11 +1,14 @@
+using ContractInProcessAPI.Authentication;
 using DataAccess;
 using DataAccess.DataAccessClients;
-using DataAccess.DataAccessUsers;
-using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using Microsoft.Extensions.DependencyInjection;
+using Models;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,21 +16,37 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors();
 builder.Services.AddSingleton(new ConfigurationData(builder.Configuration.GetConnectionString("SQLConnection")));
 
+// Configuración de la base de datos
 builder.Services.AddDbContext<UserDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SQLConnection"),
-        b => b.MigrationsAssembly("APIUserValidation"))); // Cambia "APIUserValidation" por el nombre de tu proyecto
+        b => b.MigrationsAssembly("APIUserValidation")));
 
+// Configuración de repositorios y servicios
 builder.Services.AddScoped<IClientsRepository, ClientsRepository>();
-builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddControllers();
 
-// Configuración de Swagger
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+// Llamar al método para agregar servicios de Swagger desde el helper
+builder.Services.AddSwaggerServices();
+
+// Configuración de autenticación JWT
+var key = Encoding.ASCII.GetBytes("TuClaveSecreta"); // Cambia a tu clave secreta
+builder.Services.AddAuthentication(x =>
 {
-    c.EnableAnnotations(); // Habilitar anotaciones
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "ProjUserValidation", Version = "v1" });
+    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(x =>
+{
+    x.RequireHttpsMetadata = false; // Cambia a true en producción
+    x.SaveToken = true;
+    x.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuerSigningKey = true,
+        IssuerSigningKey = new SymmetricSecurityKey(key),
+        ValidateIssuer = false,
+        ValidateAudience = false
+    };
 });
 
 // Crear la aplicación
@@ -37,8 +56,9 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
-    app.UseSwagger();
-    app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ProjUserValidation v1"));
+
+    // Llamar al método para usar el middleware de Swagger desde el helper
+    app.UseSwaggerMiddleware();
 }
 
 // Habilitar CORS
@@ -46,16 +66,18 @@ app.UseCors(option =>
 {
     option.AllowAnyMethod();
     option.AllowAnyHeader();
+    option.AllowAnyOrigin();
 });
 
-// Configuración del middleware
+// Configuración del middleware HTTPS y rutas
 app.UseHttpsRedirection();
 app.UseRouting();
 
-// Omitir la autenticación y autorización
-// app.UseAuthentication(); // Eliminar esta línea
-// app.UseAuthorization(); // Eliminar esta línea
+// Configuración de autenticación y autorización
+app.UseAuthentication();
+app.UseAuthorization();
 
-app.MapControllers(); // Registra los endpoints
+// Mapear controladores
+app.MapControllers();
 
 app.Run();

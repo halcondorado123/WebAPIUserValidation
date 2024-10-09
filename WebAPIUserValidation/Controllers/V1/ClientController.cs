@@ -36,6 +36,7 @@ namespace APIUserValidation.Controllers.V1
             }
         }
 
+        [Authorize]
         [HttpGet("GetClients")]
         [SwaggerOperation(
         Summary = SwaggerComments.Clients.GetAllUsersSummary,
@@ -55,6 +56,7 @@ namespace APIUserValidation.Controllers.V1
             }
         }
 
+        [Authorize]
         [HttpGet("GetClientByID{id}")]
         [SwaggerOperation(
         Summary = SwaggerComments.Clients.GetUserByIdSummary,

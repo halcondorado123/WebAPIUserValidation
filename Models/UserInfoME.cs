@@ -9,8 +9,9 @@ using System.Threading.Tasks;
 namespace Models
 {
     [Table("UserInfo", Schema = "UVA")]
-    public class UserInfoME : ClientME
+    public class UserInfoME
     {
+        [Key]
         [Required]
         [MaxLength(100)]
         [Column("UserName", TypeName = "varchar(100)")] // Combina los dos atributos en uno

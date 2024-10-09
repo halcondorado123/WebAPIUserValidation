@@ -1,24 +1,28 @@
 ﻿using Microsoft.OpenApi.Models;
 
-namespace APIUserValidation.Configurations
+public static class SwaggerConfig
 {
-    public static class SwaggerConfig
+    // Método para agregar servicios de Swagger
+    public static void AddSwaggerServices(this IServiceCollection services)
     {
-        public static void AddSwaggerServices(this IServiceCollection services)
+        services.AddEndpointsApiExplorer();
+        services.AddSwaggerGen(c =>
         {
-            services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen(c =>
+            c.SwaggerDoc("v1", new OpenApiInfo { Title = "UserValidation V1", Version = "Versio1.0" });
+
+            // Configuración de JWT en Swagger
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
-                c.SwaggerDoc("v1", new OpenApiInfo { Title = "UserValidation", Version = "v1" });
-                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    Description = "Use el esquema Bearer para la autorización JWT. Ingrese 'Bearer' más un espacio y su token en el campo de entrada a continuación.",
-                    Name = "Authorization",
-                    In = ParameterLocation.Header,
-                    Type = SecuritySchemeType.ApiKey,
-                    Scheme = "Bearer"
-                });
-                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                Name = "Authorization",
+                Type = SecuritySchemeType.Http,
+                Scheme = "Bearer",
+                BearerFormat = "JWT",
+                In = ParameterLocation.Header,
+                Description = "Ingrese el token JWT en el formato: Bearer {tu_token_jwt}"
+            });
+
+            // Requerir el esquema de seguridad para todas las operaciones
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
             {
                 {
                     new OpenApiSecurityScheme
@@ -26,23 +30,25 @@ namespace APIUserValidation.Configurations
                         Reference = new OpenApiReference
                         {
                             Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
+                            Id = "Bearer" // Aquí hacemos referencia al esquema de seguridad
                         }
                     },
-                    new string[] { }
+                    new string[] {}
                 }
             });
-            });
-        }
+        });
+    }
 
-        public static void UseSwaggerMiddleware(this IApplicationBuilder app)
+    // Método para usar middleware de Swagger
+    public static void UseSwaggerMiddleware(this IApplicationBuilder app)
+    {
+        app.UseSwagger(); // Habilitar Swagger
+
+        app.UseSwaggerUI(c =>
         {
-            app.UseSwagger();
-            app.UseSwaggerUI(c =>
-            {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "UserValidation V1");
-                c.RoutePrefix = string.Empty; // Esto hace que Swagger UI esté en la raíz
-            });
-        }
+            // Configurar el endpoint de Swagger
+            c.SwaggerEndpoint("/swagger/v1/swagger.json", "UserValidation V1");
+            //c.RoutePrefix = string.Empty; // Esto hace que Swagger UI esté en la raíz
+        });
     }
 }

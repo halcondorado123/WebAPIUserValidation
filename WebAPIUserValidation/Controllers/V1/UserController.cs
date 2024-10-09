@@ -115,56 +115,54 @@ namespace APIUserValidation.Controllers.V1
                 }
             }
 
-            [HttpPost("login")]
-            [AllowAnonymous]
-            public dynamic LoginUser([FromBody] object optData)
-            {
-                var data = JsonConvert.DeserializeObject<UserInfoME>(optData.ToString());
+            //    [HttpPost("login")]
+            //    [AllowAnonymous]
+            //    public dynamic LoginUser([FromBody] object optData)
+            //    {
+            //        var data = JsonConvert.DeserializeObject<UserInfoME>(optData.ToString());
 
-                List<UserInfoME> users = _IUsersRepository.GetUsers();
+            //        List<UserInfoME> users = _IUsersRepository.GetUsers();
 
-                UserInfoME user = users.FirstOrDefault(x => x.UserName == data.UserName && x.UserPassword == data.UserPassword);
+            //        UserInfoME user = users.FirstOrDefault(x => x.UserName == data.UserName && x.UserPassword == data.UserPassword);
 
-                if (user == null)
-                {
-                    return new
-                    {
-                        success = false,
-                        message = "Credenciales inválidas",
-                        result = ""
-                    };
-                }
+            //        if (user == null)
+            //        {
+            //            return new
+            //            {
+            //                success = false,
+            //                message = "Credenciales inválidas",
+            //                result = ""
+            //            };
+            //        }
 
-                var jwt = _configuration.GetSection("Jwt").Get<JWTokenME>();
+            //        var jwt = _configuration.GetSection("Jwt").Get<JWTokenME>();
 
-                var claims = new Claim[]
-                {
-            new Claim(JwtRegisteredClaimNames.Sub, jwt.Subject),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
-            new Claim("userId", user.UsuId.ToString()),
-            new Claim("userName", user.UserName),
-                };
+            //        var claims = new Claim[]
+            //        {
+            //    new Claim(JwtRegisteredClaimNames.Sub, jwt.Subject),
+            //    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+            //    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
+            //    new Claim("userId", user.UsuId.ToString()),
+            //    new Claim("userName", user.UserName),
+            //        };
 
-                var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key));
-                var signin = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-                var token = new JwtSecurityToken(
-                    jwt.Issuer,
-                    jwt.Audience,
-                    claims,
-                    expires: DateTime.Now.AddMinutes(60),
-                    signingCredentials: signin
-                );
+            //        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key));
+            //        var signin = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            //        var token = new JwtSecurityToken(
+            //            jwt.Issuer,
+            //            jwt.Audience,
+            //            claims,
+            //            expires: DateTime.Now.AddMinutes(60),
+            //            signingCredentials: signin
+            //        );
 
-                return new
-                {
-                    success = true,
-                    message = "Ingreso exitoso",
-                    result = new JwtSecurityTokenHandler().WriteToken(token)
-                };
-            }
+            //        return new
+            //        {
+            //            success = true,
+            //            message = "Ingreso exitoso",
+            //            result = new JwtSecurityTokenHandler().WriteToken(token)
+            //        };
+            //    }
         }
-
-
     }
 }
