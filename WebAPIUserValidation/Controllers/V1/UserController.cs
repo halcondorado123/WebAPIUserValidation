@@ -39,6 +39,7 @@ namespace APIUserValidation.Controllers.V1
             }
 
             [HttpGet]
+            [Authorize]
             [AllowAnonymous]
             public ActionResult GetUsers()
             {
@@ -54,6 +55,7 @@ namespace APIUserValidation.Controllers.V1
             }
 
             [HttpGet("{id}")]
+            [Authorize]
             [AllowAnonymous]
             public ActionResult GetUserById(int id)
             {
@@ -71,6 +73,7 @@ namespace APIUserValidation.Controllers.V1
             }
 
             [HttpPost]
+            [Authorize]
             [AllowAnonymous]
             public ActionResult CreateUser([FromBody] UserInfoME user)
             {
@@ -86,6 +89,7 @@ namespace APIUserValidation.Controllers.V1
             }
 
             [HttpPut]
+            [Authorize]
             [AllowAnonymous]
             public ActionResult ModifyUser([FromBody] UserInfoME user)
             {
@@ -101,6 +105,7 @@ namespace APIUserValidation.Controllers.V1
             }
 
             [HttpDelete("{id}")]
+            [Authorize]
             [AllowAnonymous]
             public ActionResult DeleteUser(int id)
             {
@@ -114,55 +119,6 @@ namespace APIUserValidation.Controllers.V1
                     return BadRequest(new { message = ex.Message });
                 }
             }
-
-            //    [HttpPost("login")]
-            //    [AllowAnonymous]
-            //    public dynamic LoginUser([FromBody] object optData)
-            //    {
-            //        var data = JsonConvert.DeserializeObject<UserInfoME>(optData.ToString());
-
-            //        List<UserInfoME> users = _IUsersRepository.GetUsers();
-
-            //        UserInfoME user = users.FirstOrDefault(x => x.UserName == data.UserName && x.UserPassword == data.UserPassword);
-
-            //        if (user == null)
-            //        {
-            //            return new
-            //            {
-            //                success = false,
-            //                message = "Credenciales inválidas",
-            //                result = ""
-            //            };
-            //        }
-
-            //        var jwt = _configuration.GetSection("Jwt").Get<JWTokenME>();
-
-            //        var claims = new Claim[]
-            //        {
-            //    new Claim(JwtRegisteredClaimNames.Sub, jwt.Subject),
-            //    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            //    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString()),
-            //    new Claim("userId", user.UsuId.ToString()),
-            //    new Claim("userName", user.UserName),
-            //        };
-
-            //        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt.Key));
-            //        var signin = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            //        var token = new JwtSecurityToken(
-            //            jwt.Issuer,
-            //            jwt.Audience,
-            //            claims,
-            //            expires: DateTime.Now.AddMinutes(60),
-            //            signingCredentials: signin
-            //        );
-
-            //        return new
-            //        {
-            //            success = true,
-            //            message = "Ingreso exitoso",
-            //            result = new JwtSecurityTokenHandler().WriteToken(token)
-            //        };
-            //    }
         }
     }
 }

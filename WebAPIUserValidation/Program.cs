@@ -30,7 +30,7 @@ builder.Services.AddControllers();
 builder.Services.AddSwaggerServices();
 
 // Configuración de autenticación JWT
-var key = Encoding.ASCII.GetBytes("TuClaveSecreta"); // Cambia a tu clave secreta
+var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:SecretKey"]);
 builder.Services.AddAuthentication(x =>
 {
     x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;

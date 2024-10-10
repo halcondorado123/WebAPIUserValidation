@@ -1,11 +1,12 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Azure.Core;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Tokens;
+using Models;
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text.Encodings.Web;
 using System.Text;
-using System.Net.Http.Headers;
-using System.Configuration;
-using Models;
 
 namespace ContractInProcessAPI.Authentication
 {
@@ -40,14 +41,17 @@ namespace ContractInProcessAPI.Authentication
                 var password = credentials[1];
 
                 var validUsers = _configuration.GetSection("UserME:Users").Get<List<UserInfoME>>();
-                //var user = validUsers.FirstOrDefault(u => u.UserName == username && u.Password == password);
+                var user = validUsers.FirstOrDefault(u => u.UserName == username && u.UserPassword == password);
 
-                if (username == null || password == null || username == null && password == null)
+                if (user == null)
                 {
                     return AuthenticateResult.Fail("Invalid credentials");
                 }
 
-                var claims = new[] { new Claim(ClaimTypes.Name, username) };
+                // Si las credenciales son válidas, generamos el token JWT
+                var token = GenerateJwtToken(username);
+
+                var claims = new[] { new Claim(ClaimTypes.Name, username), new Claim("Token", token) };
                 var identity = new ClaimsIdentity(claims, Scheme.Name);
                 var principal = new ClaimsPrincipal(identity);
 
@@ -71,6 +75,25 @@ namespace ContractInProcessAPI.Authentication
             }
 
             return credentials;
+        }
+
+        // Método para generar el token JWT
+        private string GenerateJwtToken(string username)
+        {
+            var key = Encoding.ASCII.GetBytes(_configuration["Jwt:SecretKey"]);
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var tokenDescriptor = new SecurityTokenDescriptor
+            {
+                Subject = new ClaimsIdentity(new[]
+                {
+                    new Claim(ClaimTypes.Name, username)
+                }),
+                Expires = DateTime.UtcNow.AddHours(1), // El token expirará en 1 hora
+                SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
+            };
+
+            var token = tokenHandler.CreateToken(tokenDescriptor);
+            return tokenHandler.WriteToken(token); // Devolvemos el token como string
         }
     }
 }

@@ -22,19 +22,19 @@ public static class SwaggerConfig
             });
 
             // Requerir el esquema de seguridad para todas las operaciones
-            c.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
+            c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
                 {
-                    new OpenApiSecurityScheme
                     {
-                        Reference = new OpenApiReference
+                        new Microsoft.OpenApi.Models.OpenApiSecurityScheme
                         {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer" // Aquí hacemos referencia al esquema de seguridad
-                        }
-                    },
-                    new string[] {}
-                }
+                            Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                            {
+                                Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
             });
         });
     }
@@ -48,7 +48,6 @@ public static class SwaggerConfig
         {
             // Configurar el endpoint de Swagger
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "UserValidation V1");
-            //c.RoutePrefix = string.Empty; // Esto hace que Swagger UI esté en la raíz
         });
     }
 }
