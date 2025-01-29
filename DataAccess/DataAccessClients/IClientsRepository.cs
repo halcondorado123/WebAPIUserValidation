@@ -1,5 +1,4 @@
-﻿using Models;
-using Models.ApiModel;
+﻿using ApiUserValidation.Models.Entities.ApiModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;

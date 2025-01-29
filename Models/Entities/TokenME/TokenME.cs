@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Models.TokenME
+namespace ApiUserValidation.Models.Entities.TokenME
 {
     [Table("TokenME", Schema = "UVA")]
     public class TokenME

@@ -1,4 +1,4 @@
-﻿using Models;
+﻿using ApiUserValidation.Models.Entities.UserAttributes;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text.Json.Serialization;
@@ -36,11 +36,11 @@ public class ClientME
     public string? ClientLastName { get; set; }
 
     [JsonIgnore]
-    [Column("GenreId")] // Nombre exacto en SQL
-    public int? GenreId { get; set; }
+    [Column("Gender")] // Nombre exacto en SQL
+    public int? GenderId { get; set; }
 
-    [ForeignKey("GenreId")]
-    public GenreME? Genre { get; set; }
+    [ForeignKey("GenderId")]
+    public GenderME? Gender { get; set; }
 
     [JsonIgnore]
     [Column("RelatId")] // Nombre exacto en SQL

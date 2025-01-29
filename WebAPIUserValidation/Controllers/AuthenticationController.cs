@@ -1,13 +1,13 @@
-﻿using DataAccess;
+﻿using ApiUserValidation.Models.Entities;
+using DataAccess;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace APIUserValidation.Controllers.V1
+namespace APIUserValidation.Controllers
 {
     public class AuthenticationController : Controller
     {
@@ -61,7 +61,7 @@ namespace APIUserValidation.Controllers.V1
                 var claims = new[]
                 {
             new Claim(ClaimTypes.Name, validUser.UserName),
-          
+
         };
 
                 var tokenHandler = new JwtSecurityTokenHandler();

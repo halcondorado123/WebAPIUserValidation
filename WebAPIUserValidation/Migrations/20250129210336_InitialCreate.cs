@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace APIUserValidation.Migrations
 {
     /// <inheritdoc />
-    public partial class initialCreate : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -71,6 +71,19 @@ namespace APIUserValidation.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "UserInfo",
+                schema: "UVA",
+                columns: table => new
+                {
+                    UserName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
+                    UserPassword = table.Column<string>(type: "varchar(200)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserInfo", x => x.UserName);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ClientME",
                 schema: "UVA",
                 columns: table => new
@@ -117,27 +130,6 @@ namespace APIUserValidation.Migrations
                         principalColumn: "RolID");
                 });
 
-            migrationBuilder.CreateTable(
-                name: "UserInfo",
-                schema: "UVA",
-                columns: table => new
-                {
-                    ClientId = table.Column<int>(type: "int", nullable: false),
-                    UserName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
-                    UserPassword = table.Column<string>(type: "varchar(200)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserInfo", x => x.ClientId);
-                    table.ForeignKey(
-                        name: "FK_UserInfo_ClientME_ClientId",
-                        column: x => x.ClientId,
-                        principalSchema: "UVA",
-                        principalTable: "ClientME",
-                        principalColumn: "ClientId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
             migrationBuilder.CreateIndex(
                 name: "IX_ClientME_GenreId",
                 schema: "UVA",
@@ -167,11 +159,11 @@ namespace APIUserValidation.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "UserInfo",
+                name: "ClientME",
                 schema: "UVA");
 
             migrationBuilder.DropTable(
-                name: "ClientME",
+                name: "UserInfo",
                 schema: "UVA");
 
             migrationBuilder.DropTable(

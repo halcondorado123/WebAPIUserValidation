@@ -6,19 +6,19 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Models
+namespace ApiUserValidation.Models.Entities.UserAttributes
 {
-    [Table("IdentificationME", Schema = "UVA")]
-    public class IdentificationME
+    [Table("RoleME", Schema = "UVA")]
+    public class RoleME
     {
         [Key]
-        [Column("IdentificationId")]
+        [Column("RolID")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public int IdentificationId { get; set; }
+        public int RolID { get; set; }
 
         [Required]
         [MaxLength(100)]
-        [Column(TypeName = "varchar(100)")] // Especifica el tipo de datos en la base de datos
-        public string? IdentificationType { get; set; }
+        [Column("RolType", TypeName = "varchar(100)")] // Especifica el tipo de datos en la base de datos
+        public string? RolType { get; set; }
     }
 }

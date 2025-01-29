@@ -1,15 +1,14 @@
-﻿using DataAccess.DataAccessUsers;
+﻿using ApiUserValidation.Models.Entities;
+using DataAccess.DataAccessUsers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
-using Models;
-using Models.TokenME;
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 
-namespace APIUserValidation.Controllers.V1
+namespace APIUserValidation.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Models
+namespace ApiUserValidation.Models.Entities
 {
     [Table("UserInfo", Schema = "UVA")]
     public class UserInfoME

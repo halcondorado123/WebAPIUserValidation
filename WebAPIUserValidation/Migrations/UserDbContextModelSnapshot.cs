@@ -22,6 +22,102 @@ namespace APIUserValidation.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("ApiUserValidation.Models.Entities.UserAttributes.GenderME", b =>
+                {
+                    b.Property<int>("GenderId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("GenderId");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GenderId"));
+
+                    b.Property<string>("GenderType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("GenderType");
+
+                    b.HasKey("GenderId");
+
+                    b.ToTable("GenderME", "UVA");
+                });
+
+            modelBuilder.Entity("ApiUserValidation.Models.Entities.UserAttributes.IdentificationME", b =>
+                {
+                    b.Property<int>("IdentificationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("IdentificationId");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdentificationId"));
+
+                    b.Property<string>("IdentificationType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)");
+
+                    b.HasKey("IdentificationId");
+
+                    b.ToTable("IdentificationME", "UVA");
+                });
+
+            modelBuilder.Entity("ApiUserValidation.Models.Entities.UserAttributes.RelationShME", b =>
+                {
+                    b.Property<int>("RelatId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("RelatId");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RelatId"));
+
+                    b.Property<string>("RelationType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("RelationType");
+
+                    b.HasKey("RelatId");
+
+                    b.ToTable("RelationShME", "UVA");
+                });
+
+            modelBuilder.Entity("ApiUserValidation.Models.Entities.UserAttributes.RoleME", b =>
+                {
+                    b.Property<int>("RolID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasColumnName("RolID");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RolID"));
+
+                    b.Property<string>("RolType")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("RolType");
+
+                    b.HasKey("RolID");
+
+                    b.ToTable("RoleME", "UVA");
+                });
+
+            modelBuilder.Entity("ApiUserValidation.Models.Entities.UserInfoME", b =>
+                {
+                    b.Property<string>("UserName")
+                        .HasMaxLength(100)
+                        .HasColumnType("varchar(100)")
+                        .HasColumnName("UserName");
+
+                    b.Property<string>("UserPassword")
+                        .IsRequired()
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("UserPassword");
+
+                    b.HasKey("UserName");
+
+                    b.ToTable("UserInfo", "UVA");
+                });
+
             modelBuilder.Entity("ClientME", b =>
                 {
                     b.Property<int>("ClientId")
@@ -47,9 +143,9 @@ namespace APIUserValidation.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("ClientName");
 
-                    b.Property<int?>("GenreId")
+                    b.Property<int?>("GenderId")
                         .HasColumnType("int")
-                        .HasColumnName("GenreId");
+                        .HasColumnName("Gender");
 
                     b.Property<int?>("IdentificationId")
                         .HasColumnType("int")
@@ -73,7 +169,7 @@ namespace APIUserValidation.Migrations
 
                     b.HasKey("ClientId");
 
-                    b.HasIndex("GenreId");
+                    b.HasIndex("GenderId");
 
                     b.HasIndex("IdentificationId");
 
@@ -82,141 +178,33 @@ namespace APIUserValidation.Migrations
                     b.HasIndex("RolId");
 
                     b.ToTable("ClientME", "UVA");
-
-                    b.UseTptMappingStrategy();
-                });
-
-            modelBuilder.Entity("Models.GenreME", b =>
-                {
-                    b.Property<int>("GenreId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("GenreId");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("GenreId"));
-
-                    b.Property<string>("GenderType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("GenderType");
-
-                    b.HasKey("GenreId");
-
-                    b.ToTable("GenreME", "UVA");
-                });
-
-            modelBuilder.Entity("Models.IdentificationME", b =>
-                {
-                    b.Property<int>("IdentificationId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("IdentificationId");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("IdentificationId"));
-
-                    b.Property<string>("IdentificationType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.HasKey("IdentificationId");
-
-                    b.ToTable("IdentificationME", "UVA");
-                });
-
-            modelBuilder.Entity("Models.RelationShME", b =>
-                {
-                    b.Property<int>("RelatId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("RelatId");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RelatId"));
-
-                    b.Property<string>("RelationType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("RelationType");
-
-                    b.HasKey("RelatId");
-
-                    b.ToTable("RelationShME", "UVA");
-                });
-
-            modelBuilder.Entity("Models.RoleME", b =>
-                {
-                    b.Property<int>("RolID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("RolID");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RolID"));
-
-                    b.Property<string>("RolType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("RolType");
-
-                    b.HasKey("RolID");
-
-                    b.ToTable("RoleME", "UVA");
-                });
-
-            modelBuilder.Entity("Models.UserInfoME", b =>
-                {
-                    b.HasBaseType("ClientME");
-
-                    b.Property<string>("UserName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("UserName");
-
-                    b.Property<string>("UserPassword")
-                        .IsRequired()
-                        .HasColumnType("varchar(200)")
-                        .HasColumnName("UserPassword");
-
-                    b.ToTable("UserInfo", "UVA");
                 });
 
             modelBuilder.Entity("ClientME", b =>
                 {
-                    b.HasOne("Models.GenreME", "Genre")
+                    b.HasOne("ApiUserValidation.Models.Entities.UserAttributes.GenderME", "Gender")
                         .WithMany()
-                        .HasForeignKey("GenreId");
+                        .HasForeignKey("GenderId");
 
-                    b.HasOne("Models.IdentificationME", "Identification")
+                    b.HasOne("ApiUserValidation.Models.Entities.UserAttributes.IdentificationME", "Identification")
                         .WithMany()
                         .HasForeignKey("IdentificationId");
 
-                    b.HasOne("Models.RelationShME", "Relation")
+                    b.HasOne("ApiUserValidation.Models.Entities.UserAttributes.RelationShME", "Relation")
                         .WithMany()
                         .HasForeignKey("RelatId");
 
-                    b.HasOne("Models.RoleME", "Role")
+                    b.HasOne("ApiUserValidation.Models.Entities.UserAttributes.RoleME", "Role")
                         .WithMany()
                         .HasForeignKey("RolId");
 
-                    b.Navigation("Genre");
+                    b.Navigation("Gender");
 
                     b.Navigation("Identification");
 
                     b.Navigation("Relation");
 
                     b.Navigation("Role");
-                });
-
-            modelBuilder.Entity("Models.UserInfoME", b =>
-                {
-                    b.HasOne("ClientME", null)
-                        .WithOne()
-                        .HasForeignKey("Models.UserInfoME", "ClientId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 #pragma warning restore 612, 618
         }

@@ -1,5 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Models;
+﻿using ApiUserValidation.Models.Entities;
+using ApiUserValidation.Models.Entities.UserAttributes;
+using Microsoft.EntityFrameworkCore;
 
 namespace DataAccess
 {
@@ -7,7 +8,7 @@ namespace DataAccess
     {
         public UserDbContext(DbContextOptions<UserDbContext> options) : base(options) { }
         public DbSet<ClientME>? Client { get; set; }
-        public DbSet<GenreME>? Gender { get; set; }
+        public DbSet<GenderME>? Gender { get; set; }
         public DbSet<IdentificationME>? Identification { get; set; }
         public DbSet<IdentificationME>? IdType { get; set; }
         public DbSet<RelationShME>? Relationship { get; set; }
@@ -22,8 +23,8 @@ namespace DataAccess
            .Property(e => e.ClientId)
            .ValueGeneratedOnAdd(); // Esto asegura que se genere automáticamente
 
-            modelBuilder.Entity<GenreME>()
-           .Property(e => e.GenreId)
+            modelBuilder.Entity<GenderME>()
+           .Property(e => e.GenderId)
            .ValueGeneratedOnAdd(); // Esto asegura que se genere automáticamente
 
             modelBuilder.Entity<IdentificationME>()

@@ -1,7 +1,8 @@
-﻿using Azure;
+﻿using ApiUserValidation.Models.Entities;
+using ApiUserValidation.Models.Entities.ApiModel;
+using ApiUserValidation.Models.Entities.UserAttributes;
+using Azure;
 using Microsoft.Data.SqlClient;
-using Models;
-using Models.ApiModel;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -68,9 +69,9 @@ namespace DataAccess.DataAccessClients
                                     ClientName = reader.IsDBNull(reader.GetOrdinal("ClientName")) ? string.Empty : reader.GetString(reader.GetOrdinal("ClientName")),
                                     ClientLastName = reader.IsDBNull(reader.GetOrdinal("ClientLastName")) ? string.Empty : reader.GetString(reader.GetOrdinal("ClientLastName")),
 
-                                    Genre = new GenreME
+                                    Gender = new GenderME
                                     {
-                                        GenreId = reader.IsDBNull(reader.GetOrdinal("GenreId")) ? 0 : reader.GetInt32(reader.GetOrdinal("GenreId")),
+                                        GenderId = reader.IsDBNull(reader.GetOrdinal("GenreId")) ? 0 : reader.GetInt32(reader.GetOrdinal("GenreId")),
                                         GenderType = reader.IsDBNull(reader.GetOrdinal("GenderType")) ? string.Empty : reader.GetString(reader.GetOrdinal("GenderType"))
                                     },
 
@@ -148,9 +149,9 @@ namespace DataAccess.DataAccessClients
                                 client.ClientLastName = !reader.IsDBNull(reader.GetOrdinal("ClientLastName")) ? reader.GetString(reader.GetOrdinal("ClientLastName")) : string.Empty;
 
                                 //client.GenreId = reader.GetValue(reader.GetOrdinal("ClientId")) != DBNull.Value ? reader.GetInt32(reader.GetOrdinal("ClientId")) : 0;
-                                client.Genre = new GenreME
+                                client.Gender = new GenderME
                                 {
-                                    GenreId = reader.IsDBNull(reader.GetOrdinal("GenreId")) ? 0 : reader.GetInt32(reader.GetOrdinal("GenreId")),
+                                    GenderId = reader.IsDBNull(reader.GetOrdinal("GenreId")) ? 0 : reader.GetInt32(reader.GetOrdinal("GenreId")),
                                     GenderType = !reader.IsDBNull(reader.GetOrdinal("GenderType")) ? reader.GetString(reader.GetOrdinal("GenderType")) : string.Empty
                                 };
 
@@ -214,7 +215,7 @@ namespace DataAccess.DataAccessClients
                         command.Parameters.AddWithValue("@IdentificationNumber", client?.IdentificationNumber);
                         command.Parameters.AddWithValue("@ClientName", client?.ClientName);
                         command.Parameters.AddWithValue("@ClientLastName", client?.ClientLastName);
-                        command.Parameters.AddWithValue("@GenreId", client?.Genre?.GenreId ?? (object)DBNull.Value);
+                        command.Parameters.AddWithValue("@GenreId", client?.Gender?.GenderId ?? (object)DBNull.Value);
                         command.Parameters.AddWithValue("@RelatId", client?.Relation?.RelatId ?? (object)DBNull.Value);
                         command.Parameters.AddWithValue("@Age", client?.Age); // Usa la edad calculada
                         command.Parameters.AddWithValue("@Birthday", client?.Birthday);
@@ -285,7 +286,7 @@ namespace DataAccess.DataAccessClients
                     command.Parameters.AddWithValue("@IdentificationNumber", client?.IdentificationNumber);
                     command.Parameters.AddWithValue("@ClientName", client?.ClientName);
                     command.Parameters.AddWithValue("@ClientLastName", client?.ClientLastName);
-                    command.Parameters.AddWithValue("@GenreId", client?.Genre?.GenreId ?? (object)DBNull.Value);
+                    command.Parameters.AddWithValue("@GenreId", client?.Gender?.GenderId ?? (object)DBNull.Value);
                     command.Parameters.AddWithValue("@RelatId", client?.Relation?.RelatId ?? (object)DBNull.Value);
                     command.Parameters.AddWithValue("@Age", client?.Age); // Usa la edad calculada
                     command.Parameters.AddWithValue("@Birthday", client?.Birthday);

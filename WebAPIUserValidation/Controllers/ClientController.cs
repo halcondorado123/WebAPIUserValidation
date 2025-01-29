@@ -3,13 +3,11 @@ using DataAccess;
 using DataAccess.DataAccessClients;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Models;
-using Models.TokenME;
 using Swashbuckle.AspNetCore.Annotations;
 using System;
 using System.Security.Claims;
 
-namespace APIUserValidation.Controllers.V1
+namespace APIUserValidation.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]

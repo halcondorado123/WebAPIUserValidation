@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using Microsoft.Extensions.DependencyInjection;
-using Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -51,6 +50,9 @@ builder.Services.AddAuthentication(x =>
 
 // Crear la aplicación
 var app = builder.Build();
+
+// Llamar a la inicialización de la base de datos
+await DatabaseInitializer.SeedDataAsync(app.Services);
 
 // Configuración del middleware
 if (app.Environment.IsDevelopment())
