@@ -7,6 +7,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using APIUserValidation.Modules.Mapper;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,13 +20,18 @@ builder.Services.AddDbContext<UserDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SQLConnection"),
         b => b.MigrationsAssembly("APIUserValidation")));
 
+
+
+
 // Configuración de repositorios y servicios
 //builder.Services.AddScoped<IClientsRepository, ClientsRepository>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddScoped<IPersonRepository, PersonRepository>();
 builder.Services.AddControllers();
 
-// Llamar al método para agregar servicios de Swagger desde el helper
+// MODULES
 builder.Services.AddSwaggerServices();
+builder.Services.AddMapper();
 
 // Configuración de autenticación JWT
 var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:SecretKey"]);

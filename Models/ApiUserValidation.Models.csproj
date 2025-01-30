@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8">
@@ -16,8 +17,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\ApiModel\" />
-    <Folder Include="DTOs\Token\" />
+    <Folder Include="DTOs\ApiModelDTO\" />
+    <Folder Include="DTOs\TokenDTO\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>
 

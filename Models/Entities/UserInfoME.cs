@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApiUserValidation.Models.Entities
 {
-    [Table("UserInfo", Schema = "UVA")]
+    [Table("UserInfoME", Schema = "UVA")]
     public class UserInfoME
     {
         [Key]
@@ -13,9 +13,9 @@ namespace ApiUserValidation.Models.Entities
         public int UserId { get; set; }
 
         [Column("PersonId")]
+        [ForeignKey("PersonId")]
         public int? PersonId { get; set; }
 
-        [ForeignKey("PersonId")]
         public PersonME? Person { get; set; }  // Relación con la persona
 
         [Required]

@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace APIUserValidation.Migrations
 {
     [DbContext(typeof(UserDbContext))]
-    [Migration("20250130154404_InitCreate")]
+    [Migration("20250130210923_InitCreate")]
     partial class InitCreate
     {
         /// <inheritdoc />
@@ -53,7 +53,7 @@ namespace APIUserValidation.Migrations
 
                     b.Property<int?>("GenderId")
                         .HasColumnType("int")
-                        .HasColumnName("Gender");
+                        .HasColumnName("GenderId");
 
                     b.Property<int?>("IdentificationId")
                         .HasColumnType("int")
@@ -63,9 +63,9 @@ namespace APIUserValidation.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("IdentificationNumber");
 
-                    b.Property<int>("UsuId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int")
-                        .HasColumnName("UsuId");
+                        .HasColumnName("UserId");
 
                     b.HasKey("PersonId");
 
@@ -117,32 +117,12 @@ namespace APIUserValidation.Migrations
                     b.ToTable("IdentificationME", "UVA");
                 });
 
-            modelBuilder.Entity("ApiUserValidation.Models.Entities.UserAttributesME.RelationShME", b =>
-                {
-                    b.Property<int>("RelatId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("RelatId");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RelatId"));
-
-                    b.Property<string>("RelationType")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)")
-                        .HasColumnName("RelationType");
-
-                    b.HasKey("RelatId");
-
-                    b.ToTable("RelationShME", "UVA");
-                });
-
             modelBuilder.Entity("ApiUserValidation.Models.Entities.UserAttributesME.RoleME", b =>
                 {
                     b.Property<int>("RolID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("RolID");
+                        .HasColumnName("RolId");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RolID"));
 
@@ -217,7 +197,7 @@ namespace APIUserValidation.Migrations
                         .IsUnique()
                         .HasFilter("[PersonId] IS NOT NULL");
 
-                    b.ToTable("UserInfo", "UVA");
+                    b.ToTable("UserInfoME", "UVA");
                 });
 
             modelBuilder.Entity("ApiUserValidation.Models.Entities.ClientME", b =>
@@ -227,10 +207,6 @@ namespace APIUserValidation.Migrations
                     b.Property<int?>("RoleId")
                         .HasColumnType("int")
                         .HasColumnName("RolId");
-
-                    b.Property<int?>("UserInfoId")
-                        .HasColumnType("int")
-                        .HasColumnName("UsuId");
 
                     b.HasIndex("RoleId");
 

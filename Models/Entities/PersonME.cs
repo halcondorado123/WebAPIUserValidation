@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Text.Json.Serialization;
 using ApiUserValidation.Models.Entities.UserAttributesME;
+using ApiUserValidation.Models.DTOs.UserAttributesDTO;
 
 namespace ApiUserValidation.Models.Entities
 {
@@ -18,10 +19,10 @@ namespace ApiUserValidation.Models.Entities
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int PersonId { get; set; }
 
-        [JsonIgnore]
         [Column("IdentificationId")] // Nombre exacto en SQL
         public int? IdentificationId { get; set; }
 
+        [JsonIgnore]
         [ForeignKey("IdentificationId")]
         public IdentificationME? Identification { get; set; }
 
@@ -34,11 +35,10 @@ namespace ApiUserValidation.Models.Entities
         [Column("ClientLastName")] // Nombre exacto en SQL
         public string? ClientLastName { get; set; }
 
-        [JsonIgnore]
-        [Column("Gender")] // Nombre exacto en SQL
+        [Column("GenderId")] // Nombre exacto en SQL
         public int? GenderId { get; set; }
 
-        [ForeignKey("GenderId")]
+        [JsonIgnore]
         public GenderME? Gender { get; set; }
 
         [Column("Age")] // Nombre exacto en SQL
@@ -55,8 +55,16 @@ namespace ApiUserValidation.Models.Entities
             return age;
         }
 
-        [Column("UsuId")] // Nombre exacto en SQL
-        public int UsuId { get; set; }
+        [Column("UserId")] // Nombre exacto en SQL
+        public int? UserId { get; set; }
+
+        [Column("Email")] // Nombre exacto en SQL
+        public string Email { get; set; }
+
+        [Column("Phone")] // Nombre exacto en SQL
+        public string Phone { get; set; }
+
+        [JsonIgnore]
         public UserInfoME? UserInfo { get; set; }  // Relación de uno a uno
     }
 }

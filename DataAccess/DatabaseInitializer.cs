@@ -21,8 +21,8 @@ public static class DatabaseInitializer
         // Seed otros datos (Género, Identificación, Estado Civil)
         await SeedGendersAsync(context);
         await SeedIdentificationTypesAsync(context);
-        await SeedRelationshipStatusesAsync(context);
         await SeedRolesAsync(context);
+        await SendStatusTypeAsync(context);
     }
 
     // 3️⃣ Seed de Géneros
@@ -55,23 +55,6 @@ public static class DatabaseInitializer
         }
     }
 
-    // 6️⃣ Seed de Estado de Relación
-    private static async Task SeedRelationshipStatusesAsync(UserDbContext context)
-    {
-        if (!context.Relationship.Any())
-        {
-            context.Relationship.AddRange(
-                new RelationShME { RelationType = "Soltero" },
-                new RelationShME { RelationType = "Comprometido" },
-                new RelationShME { RelationType = "Casado" },
-                new RelationShME { RelationType = "Viudo" },
-                new RelationShME { RelationType = "Separado" },
-                new RelationShME { RelationType = "Unión libre" }
-            );
-            await context.SaveChangesAsync();
-        }
-    }
-
     // 5️⃣ Seed de Estado Civil
     private static async Task SeedRolesAsync(UserDbContext context)
     {
@@ -91,4 +74,19 @@ public static class DatabaseInitializer
     }
 
 
+    private static async Task SendStatusTypeAsync(UserDbContext context)
+    {
+        if (!context.Status.Any())
+        {
+            context.Status.AddRange(
+                new StatusME { StatusType = "Activo" },
+                new StatusME { StatusType = "Inactivo" },
+                new StatusME { StatusType = "Suspendido" },
+                new StatusME { StatusType = "Bloqueado" },
+                new StatusME { StatusType = "Supervisor" },
+                new StatusME { StatusType = "Baneado" }
+            );
+            await context.SaveChangesAsync();
+        }
+    }
 }

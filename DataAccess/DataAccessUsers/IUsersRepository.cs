@@ -1,4 +1,5 @@
-﻿using ApiUserValidation.Models.Entities;
+﻿using ApiUserValidation.Models.DTOs;
+using ApiUserValidation.Models.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
