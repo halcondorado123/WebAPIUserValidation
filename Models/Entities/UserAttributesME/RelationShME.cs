@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ApiUserValidation.Models.Entities.UserAttributes
+namespace ApiUserValidation.Models.Entities.UserAttributesME
 {
     [Table("RelationShME", Schema = "UVA")]
     public class RelationShME

@@ -10,8 +10,8 @@ namespace ApiUserValidation.Models.Entities.TokenME
     [Table("TokenME", Schema = "UVA")]
     public class TokenME
     {
-        public bool success { get; set; }
-        public string? message { get; set; }
-        public string? result { get; set; }
+        public bool Success { get; set; }
+        public string? Message { get; set; }
+        public string? Result { get; set; }
     }
 }

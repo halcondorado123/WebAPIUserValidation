@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace APIUserValidation.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -15,17 +15,17 @@ namespace APIUserValidation.Migrations
                 name: "UVA");
 
             migrationBuilder.CreateTable(
-                name: "GenreME",
+                name: "GenderME",
                 schema: "UVA",
                 columns: table => new
                 {
-                    GenreId = table.Column<int>(type: "int", nullable: false)
+                    GenderId = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     GenderType = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_GenreME", x => x.GenreId);
+                    table.PrimaryKey("PK_GenderME", x => x.GenderId);
                 });
 
             migrationBuilder.CreateTable(
@@ -71,16 +71,50 @@ namespace APIUserValidation.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserInfo",
+                name: "StatusME",
                 schema: "UVA",
                 columns: table => new
                 {
-                    UserName = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false),
-                    UserPassword = table.Column<string>(type: "varchar(200)", nullable: false)
+                    StatusId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    StatusType = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_UserInfo", x => x.UserName);
+                    table.PrimaryKey("PK_StatusME", x => x.StatusId);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "PersonME",
+                schema: "UVA",
+                columns: table => new
+                {
+                    ClientId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    IdentificationId = table.Column<int>(type: "int", nullable: true),
+                    IdentificationNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ClientLastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    Gender = table.Column<int>(type: "int", nullable: true),
+                    Age = table.Column<int>(type: "int", nullable: false),
+                    Birthday = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UsuId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_PersonME", x => x.ClientId);
+                    table.ForeignKey(
+                        name: "FK_PersonME_GenderME_Gender",
+                        column: x => x.Gender,
+                        principalSchema: "UVA",
+                        principalTable: "GenderME",
+                        principalColumn: "GenderId");
+                    table.ForeignKey(
+                        name: "FK_PersonME_IdentificationME_IdentificationId",
+                        column: x => x.IdentificationId,
+                        principalSchema: "UVA",
+                        principalTable: "IdentificationME",
+                        principalColumn: "IdentificationId");
                 });
 
             migrationBuilder.CreateTable(
@@ -88,71 +122,80 @@ namespace APIUserValidation.Migrations
                 schema: "UVA",
                 columns: table => new
                 {
-                    ClientId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
+                    ClientId = table.Column<int>(type: "int", nullable: false),
                     RolId = table.Column<int>(type: "int", nullable: true),
-                    IdentificationId = table.Column<int>(type: "int", nullable: true),
-                    IdentificationNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClientName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClientLastName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    GenreId = table.Column<int>(type: "int", nullable: true),
-                    RelatId = table.Column<int>(type: "int", nullable: true),
-                    Age = table.Column<int>(type: "int", nullable: false),
-                    Birthday = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UsuId = table.Column<int>(type: "int", nullable: false)
+                    UsuId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ClientME", x => x.ClientId);
                     table.ForeignKey(
-                        name: "FK_ClientME_GenreME_GenreId",
-                        column: x => x.GenreId,
+                        name: "FK_ClientME_PersonME_ClientId",
+                        column: x => x.ClientId,
                         principalSchema: "UVA",
-                        principalTable: "GenreME",
-                        principalColumn: "GenreId");
-                    table.ForeignKey(
-                        name: "FK_ClientME_IdentificationME_IdentificationId",
-                        column: x => x.IdentificationId,
-                        principalSchema: "UVA",
-                        principalTable: "IdentificationME",
-                        principalColumn: "IdentificationId");
-                    table.ForeignKey(
-                        name: "FK_ClientME_RelationShME_RelatId",
-                        column: x => x.RelatId,
-                        principalSchema: "UVA",
-                        principalTable: "RelationShME",
-                        principalColumn: "RelatId");
+                        principalTable: "PersonME",
+                        principalColumn: "ClientId",
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_ClientME_RoleME_RolId",
                         column: x => x.RolId,
                         principalSchema: "UVA",
                         principalTable: "RoleME",
-                        principalColumn: "RolID");
+                        principalColumn: "RolID",
+                        onDelete: ReferentialAction.Restrict);
                 });
 
-            migrationBuilder.CreateIndex(
-                name: "IX_ClientME_GenreId",
+            migrationBuilder.CreateTable(
+                name: "UserInfo",
                 schema: "UVA",
-                table: "ClientME",
-                column: "GenreId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ClientME_IdentificationId",
-                schema: "UVA",
-                table: "ClientME",
-                column: "IdentificationId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ClientME_RelatId",
-                schema: "UVA",
-                table: "ClientME",
-                column: "RelatId");
+                columns: table => new
+                {
+                    UserId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    PersonId = table.Column<int>(type: "int", nullable: true),
+                    UserName = table.Column<string>(type: "varchar(100)", nullable: false),
+                    UserPasswordHash = table.Column<string>(type: "varchar(200)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LastLogin = table.Column<DateTime>(type: "datetime2", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserInfo", x => x.UserId);
+                    table.ForeignKey(
+                        name: "FK_UserInfo_PersonME_PersonId",
+                        column: x => x.PersonId,
+                        principalSchema: "UVA",
+                        principalTable: "PersonME",
+                        principalColumn: "ClientId",
+                        onDelete: ReferentialAction.Cascade);
+                });
 
             migrationBuilder.CreateIndex(
                 name: "IX_ClientME_RolId",
                 schema: "UVA",
                 table: "ClientME",
                 column: "RolId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PersonME_Gender",
+                schema: "UVA",
+                table: "PersonME",
+                column: "Gender");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_PersonME_IdentificationId",
+                schema: "UVA",
+                table: "PersonME",
+                column: "IdentificationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_UserInfo_PersonId",
+                schema: "UVA",
+                table: "UserInfo",
+                column: "PersonId",
+                unique: true,
+                filter: "[PersonId] IS NOT NULL");
         }
 
         /// <inheritdoc />
@@ -163,23 +206,31 @@ namespace APIUserValidation.Migrations
                 schema: "UVA");
 
             migrationBuilder.DropTable(
-                name: "UserInfo",
-                schema: "UVA");
-
-            migrationBuilder.DropTable(
-                name: "GenreME",
-                schema: "UVA");
-
-            migrationBuilder.DropTable(
-                name: "IdentificationME",
-                schema: "UVA");
-
-            migrationBuilder.DropTable(
                 name: "RelationShME",
                 schema: "UVA");
 
             migrationBuilder.DropTable(
+                name: "StatusME",
+                schema: "UVA");
+
+            migrationBuilder.DropTable(
+                name: "UserInfo",
+                schema: "UVA");
+
+            migrationBuilder.DropTable(
                 name: "RoleME",
+                schema: "UVA");
+
+            migrationBuilder.DropTable(
+                name: "PersonME",
+                schema: "UVA");
+
+            migrationBuilder.DropTable(
+                name: "GenderME",
+                schema: "UVA");
+
+            migrationBuilder.DropTable(
+                name: "IdentificationME",
                 schema: "UVA");
         }
     }

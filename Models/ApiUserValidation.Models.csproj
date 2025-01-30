@@ -16,7 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="DTOs\" />
+    <Folder Include="DTOs\ApiModel\" />
+    <Folder Include="DTOs\Token\" />
     <Folder Include="ViewModels\" />
   </ItemGroup>
 

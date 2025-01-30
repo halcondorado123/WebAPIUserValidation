@@ -6,13 +6,13 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ApiUserValidation.Models.Entities.UserAttributes
+namespace ApiUserValidation.Models.Entities.UserAttributesME
 {
     [Table("RoleME", Schema = "UVA")]
     public class RoleME
     {
         [Key]
-        [Column("RolID")]
+        [Column("RolId")]
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int RolID { get; set; }
 

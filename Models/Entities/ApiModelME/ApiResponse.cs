@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ApiUserValidation.Models.Entities.ApiModel
+namespace ApiUserValidation.Models.Entities.ApiModelME
 {
     public class ApiResponse
     {

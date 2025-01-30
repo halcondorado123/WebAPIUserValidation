@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-namespace ApiUserValidation.Models.Entities.UserAttributes
+namespace ApiUserValidation.Models.Entities.UserAttributesME
 {
     [Table("GenderME", Schema = "UVA")]
     public class GenderME

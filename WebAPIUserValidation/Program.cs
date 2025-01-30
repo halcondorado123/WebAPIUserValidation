@@ -1,4 +1,3 @@
-using ContractInProcessAPI.Authentication;
 using DataAccess;
 using DataAccess.DataAccessClients;
 using Microsoft.AspNetCore.Authentication;
@@ -21,7 +20,7 @@ builder.Services.AddDbContext<UserDbContext>(options =>
         b => b.MigrationsAssembly("APIUserValidation")));
 
 // Configuración de repositorios y servicios
-builder.Services.AddScoped<IClientsRepository, ClientsRepository>();
+//builder.Services.AddScoped<IClientsRepository, ClientsRepository>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddControllers();
 

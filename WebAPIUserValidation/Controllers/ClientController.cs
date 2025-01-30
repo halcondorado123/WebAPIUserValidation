@@ -1,4 +1,5 @@
-﻿using APIUserValidation.Helpers;
+﻿using ApiUserValidation.Models.Entities;
+using APIUserValidation.Helpers;
 using DataAccess;
 using DataAccess.DataAccessClients;
 using Microsoft.AspNetCore.Authorization;

@@ -1,10 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace ApiUserValidation.Models.Entities
 {
@@ -12,15 +8,31 @@ namespace ApiUserValidation.Models.Entities
     public class UserInfoME
     {
         [Key]
+        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+        [Column("UserId")]
+        public int UserId { get; set; }
+
+        [Column("PersonId")]
+        public int? PersonId { get; set; }
+
+        [ForeignKey("PersonId")]
+        public PersonME? Person { get; set; }  // Relación con la persona
+
         [Required]
-        [MaxLength(100)]
-        [Column("UserName", TypeName = "varchar(100)")] // Combina los dos atributos en uno
+        [Column("UserName", TypeName = "varchar(100)")]
         public string? UserName { get; set; }
 
-        // Almacena el hash de la contraseña
         [Required]
-        [Column("UserPassword", TypeName = "varchar(200)")] // Combina aquí también
-        public string? UserPassword { get; set; }
-    }
+        [Column("UserPasswordHash", TypeName = "varchar(200)")]
+        public string? UserPasswordHash { get; private set; } // Solo almacena el hash
 
+        [Column("CreatedAt")]
+        public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
+        [Column("UpdatedAt")]
+        public DateTime? UpdatedAt { get; set; }
+
+        [Column("LastLogin")]
+        public DateTime? LastLogin { get; set; }
+    }
 }

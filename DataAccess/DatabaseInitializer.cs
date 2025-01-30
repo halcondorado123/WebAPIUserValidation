@@ -1,5 +1,5 @@
 ﻿using ApiUserValidation.Models.Entities;
-using ApiUserValidation.Models.Entities.UserAttributes;
+using ApiUserValidation.Models.Entities.UserAttributesME;
 using DataAccess;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
