@@ -15,7 +15,7 @@ namespace ApiUserValidation.Models.Entities
     public class PersonME
     {
         [Key]
-        [Column("ClientId")] // Nombre exacto en SQL
+        [Column("PersonId")] // Nombre exacto en SQL
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public int PersonId { get; set; }
 
@@ -64,7 +64,7 @@ namespace ApiUserValidation.Models.Entities
         [Column("Phone")] // Nombre exacto en SQL
         public string Phone { get; set; }
 
-        [JsonIgnore]
+        [JsonIgnore] 
         public UserInfoME? UserInfo { get; set; }  // Relación de uno a uno
     }
 }

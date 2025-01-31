@@ -11,9 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace APIUserValidation.Migrations
 {
-    [DbContext(typeof(ApiUserValidation.Data.Context.WebAppDbContext))]
-    [Migration("20250130210923_InitCreate")]
-    partial class InitCreate
+    [DbContext(typeof(WebAppDbContext))]
+    [Migration("20250131154858_ModifyColumnTablePerson")]
+    partial class ModifyColumnTablePerson
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -31,7 +31,7 @@ namespace APIUserValidation.Migrations
                     b.Property<int>("PersonId")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("ClientId");
+                        .HasColumnName("PersonId");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PersonId"));
 
@@ -51,6 +51,11 @@ namespace APIUserValidation.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("ClientName");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Email");
+
                     b.Property<int?>("GenderId")
                         .HasColumnType("int")
                         .HasColumnName("GenderId");
@@ -63,7 +68,12 @@ namespace APIUserValidation.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("IdentificationNumber");
 
-                    b.Property<int>("UserId")
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Phone");
+
+                    b.Property<int?>("UserId")
                         .HasColumnType("int")
                         .HasColumnName("UserId");
 

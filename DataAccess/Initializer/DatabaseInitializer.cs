@@ -1,6 +1,6 @@
-﻿using ApiUserValidation.Models.Entities;
+﻿using ApiUserValidation.Data.Context;
+using ApiUserValidation.Models.Entities;
 using ApiUserValidation.Models.Entities.UserAttributesME;
-using DataAccess;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +13,7 @@ public static class DatabaseInitializer
     public static async Task SeedDataAsync(IServiceProvider serviceProvider)
     {
         using var scope = serviceProvider.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<UserDbContext>();
+        var context = scope.ServiceProvider.GetRequiredService<ApiUserValidation.Data.Context.WebAppDbContext>();
 
         // Aplicar migraciones si no están aplicadas
         await context.Database.MigrateAsync();
@@ -26,7 +26,7 @@ public static class DatabaseInitializer
     }
 
     // 3️⃣ Seed de Géneros
-    private static async Task SeedGendersAsync(UserDbContext context)
+    private static async Task SeedGendersAsync(ApiUserValidation.Data.Context.WebAppDbContext context)
     {
         if (!context.Gender.Any())
         {
@@ -40,7 +40,7 @@ public static class DatabaseInitializer
     }
 
     // 4️⃣ Seed de Tipos de Identificación
-    private static async Task SeedIdentificationTypesAsync(UserDbContext context)
+    private static async Task SeedIdentificationTypesAsync(ApiUserValidation.Data.Context.WebAppDbContext context)
     {
         if (!context.Identification.Any())
         {
@@ -56,7 +56,7 @@ public static class DatabaseInitializer
     }
 
     // 5️⃣ Seed de Estado Civil
-    private static async Task SeedRolesAsync(UserDbContext context)
+    private static async Task SeedRolesAsync(ApiUserValidation.Data.Context.WebAppDbContext context)
     {
         if (!context.Role.Any())
         {
@@ -74,7 +74,7 @@ public static class DatabaseInitializer
     }
 
 
-    private static async Task SendStatusTypeAsync(UserDbContext context)
+    private static async Task SendStatusTypeAsync(ApiUserValidation.Data.Context.WebAppDbContext context)
     {
         if (!context.Status.Any())
         {

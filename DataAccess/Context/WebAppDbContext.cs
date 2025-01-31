@@ -1,18 +1,16 @@
-﻿using ApiUserValidation.Models.DTOs;
-using ApiUserValidation.Models.DTOs.UserAttributesDTO;
+﻿
 using ApiUserValidation.Models.Entities;
 using ApiUserValidation.Models.Entities.UserAttributesME;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace DataAccess
+namespace ApiUserValidation.Data.Context
 {
-    public class UserDbContext : DbContext
+    public class WebAppDbContext : DbContext
     {
-        public UserDbContext(DbContextOptions<UserDbContext> options) : base(options) { }
+        public WebAppDbContext(DbContextOptions<WebAppDbContext> options) : base(options) { }
         public DbSet<ClientME> Clients { get; set; }
         public DbSet<PersonME> People { get; set; }
-        public DbSet<UserInfoME>? UserInfo { get; set; }
+        public DbSet<UserInfoME> UserInfo { get; set; }
         public DbSet<GenderME>? Gender { get; set; }
         public DbSet<IdentificationME>? Identification { get; set; }
         public DbSet<RoleME>? Role { get; set; }

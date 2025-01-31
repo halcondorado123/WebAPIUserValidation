@@ -1,5 +1,3 @@
-using DataAccess;
-using DataAccess.DataAccessClients;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -8,6 +6,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using APIUserValidation.Modules.Mapper;
+using ApiUserValidation.Data.DataAccess.Clients;
+using ApiUserValidation.Data.Context;
+using ApiUserValidation.Data.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -16,7 +17,7 @@ builder.Services.AddCors();
 builder.Services.AddSingleton(new ConfigurationData(builder.Configuration.GetConnectionString("SQLConnection")));
 
 // Configuración de la base de datos
-builder.Services.AddDbContext<UserDbContext>(options =>
+builder.Services.AddDbContext<WebAppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SQLConnection"),
         b => b.MigrationsAssembly("APIUserValidation")));
 

@@ -1,13 +1,10 @@
-﻿using ApiUserValidation.Models.DTOs;
-using ApiUserValidation.Models.Entities;
+﻿using ApiUserValidation.Data.Configuration;
+using ApiUserValidation.Data.DataAccess.Clients;
+using ApiUserValidation.Models.DTOs;
 using APIUserValidation.Helpers;
-using DataAccess;
-using DataAccess.DataAccessClients;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using System;
-using System.Security.Claims;
 
 namespace APIUserValidation.Controllers
 {
@@ -21,9 +18,8 @@ namespace APIUserValidation.Controllers
         public ClientController(IPersonRepository personRepository, ConfigurationData configurationData)
         {
             _personRepository = personRepository;
-            _configurationData = configurationData; // Asignación correcta
+            _configurationData = configurationData;
         }
-
 
         [AllowAnonymous]
         [HttpGet("GetClients")]
@@ -34,112 +30,90 @@ namespace APIUserValidation.Controllers
         {
             try
             {
-                var clients = await _personRepository.GetClientsAsync(); // Asegúrate de usar await aquí
-                return new JsonResult(clients); // Usa JsonResult para devolver datos en formato JSON
+                var clients = await _personRepository.GetPeopleAsync();
+                return new JsonResult(clients);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message); // Manejo de error
+                return BadRequest(ex.Message);
             }
         }
 
         [AllowAnonymous]
-        [HttpPost("CreateClientsAsync")]
+        [HttpGet("GetClientByID{personId}")]
         [SwaggerOperation(
-        Summary = SwaggerComments.Clients.CreateUserSummary,
-        Description = SwaggerComments.Clients.CreateUserDescription)]
-        public async Task<IActionResult> CreateClientsAsync(PersonDTO person)
+        Summary = SwaggerComments.Clients.GetUserByIdSummary,
+        Description = SwaggerComments.Clients.GetUserByIdDescription)]
+        public async Task<IActionResult> GetClientById(int personId)
         {
             try
             {
-                // Usa 'await' para esperar la ejecución del método asíncrono
-                await _personRepository.CreateAsync(person);
+                var client = await _personRepository.GetPersonByIdAsync(personId);
+                if (client == null) return NotFound();
 
-                // Si todo va bien, devuelve un mensaje de éxito
-                return Ok(new { message = "Client created successfully." });
+                return new JsonResult(client);
             }
             catch (Exception ex)
             {
-                // Si ocurre un error, lo devuelve en formato BadRequest
                 return BadRequest(new { message = ex.Message });
             }
         }
 
-        //[Authorize]
-        //[HttpGet("GetClientByID{id}")]
-        //[SwaggerOperation(
-        //Summary = SwaggerComments.Clients.GetUserByIdSummary,
-        //Description = SwaggerComments.Clients.GetUserByIdDescription)]
-        //public ActionResult GetClientById(int id)
-        //{
-        //    try
-        //    {
-        //        var client = _clientsRepository.GetClientById(id);
-        //        if (client == null) return NotFound(); // Manejo de cliente no encontrado
+        [AllowAnonymous]
+        [HttpPost("CreatePerson")]
+        [SwaggerOperation(
+         Summary = SwaggerComments.Clients.CreateUserSummary,
+         Description = SwaggerComments.Clients.CreateUserDescription)]
+        public async Task<IActionResult> CreatePerson([FromBody] PersonDTO person)
+        {
+            try
+            {
+               var idCreated = await _personRepository.CreatePersonAsync(person);
 
-        //        return Ok(client);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Log el error si es necesario
-        //        return BadRequest(new { message = ex.Message });
-        //    }
-        //}
+                return Ok(new { message = "The client has been successfully created, the ID code is " + idCreated });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
 
-        //[HttpPost("CreateClient")]
-        //[SwaggerOperation(
-        //Summary = SwaggerComments.Clients.CreateUserSummary,
-        //Description = SwaggerComments.Clients.CreateUserDescription)]
-        //public ActionResult CreateClient([FromBody] ClientME client)
-        //{
-        //    try
-        //    {
-        //        var createdClient = _clientsRepository.CreateClient(client);
-        //        return Ok(createdClient);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Log el error si es necesario
-        //        return BadRequest(new { message = ex.Message });
-        //    }
-        //}
+        [AllowAnonymous]
+        [HttpPut("UpdatePerson")]
+        [SwaggerOperation(
+        Summary = SwaggerComments.Clients.UpdateUserSummary,
+        Description = SwaggerComments.Clients.UpdateUserDescription)]
+        public async Task<IActionResult> UpdatePerson([FromBody]PersonDTO person)
+        {
+            try
+            {
+                await _personRepository.UpdatePersonAsync(person);
 
+                return Ok(new { message = "The client has been successfully updated." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
 
-        //[HttpPut("ModifyClient")]
-        //[SwaggerOperation(
-        //Summary = SwaggerComments.Clients.UpdateUserSummary,
-        //Description = SwaggerComments.Clients.UpdateUserDescription)]
-        //public ActionResult ModifyClient([FromBody] ClientME client)
-        //{
-        //    try
-        //    {
-        //        var modifiedClient = _clientsRepository.ModifyClient(client);
-        //        return Ok(modifiedClient);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Log el error si es necesario
-        //        return BadRequest(new { message = ex.Message });
-        //    }
-        //}
+        [AllowAnonymous]
+        [HttpDelete("DeletePerson")]
+        [SwaggerOperation(
+        Summary = SwaggerComments.Clients.UpdateUserSummary,
+        Description = SwaggerComments.Clients.UpdateUserDescription)]
+        public async Task<IActionResult> DeletePerson(int personId)
+        {
+            try
+            {
+                await _personRepository.DeletePersonAsync(personId);
 
-        //[HttpDelete("DeleteClient{id}")]
-        //[SwaggerOperation(
-        //Summary = SwaggerComments.Clients.DeleteUserSummary,
-        //Description = SwaggerComments.Clients.DeleteUserDescription)]
-        //public ActionResult DeleteClient(int id)
-        //{
-        //    try
-        //    {
-        //        var result = _clientsRepository.DeleteClient(id);
-        //        return Ok(result);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        // Log el error si es necesario
-        //        return BadRequest(new { message = ex.Message });
-        //    }
-        //}
-
+                return Ok(new { message = "The client has been successfully deleted." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
