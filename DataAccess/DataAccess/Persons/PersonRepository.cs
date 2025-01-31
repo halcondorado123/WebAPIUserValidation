@@ -7,7 +7,7 @@ using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 
-namespace ApiUserValidation.Data.DataAccess.Clients
+namespace ApiUserValidation.Data.DataAccess.Persons
 {
     public class PersonRepository : IPersonRepository
     {

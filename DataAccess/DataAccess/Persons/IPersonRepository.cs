@@ -1,13 +1,6 @@
 ﻿using ApiUserValidation.Models.DTOs;
-using ApiUserValidation.Models.Entities;
-using ApiUserValidation.Models.Entities.ApiModelME;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace ApiUserValidation.Data.DataAccess.Clients
+namespace ApiUserValidation.Data.DataAccess.Persons
 {
     public interface IPersonRepository
     {

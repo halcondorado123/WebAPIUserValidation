@@ -1,14 +1,11 @@
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.OpenApi.Models;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using APIUserValidation.Modules.Mapper;
-using ApiUserValidation.Data.DataAccess.Clients;
 using ApiUserValidation.Data.Context;
 using ApiUserValidation.Data.Configuration;
+using ApiUserValidation.Data.DataAccess.Persons;
 
 var builder = WebApplication.CreateBuilder(args);
 
