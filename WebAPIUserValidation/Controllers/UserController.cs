@@ -25,24 +25,23 @@ namespace APIUserValidation.Controllers
             _configuration = configuration;
         }
 
-        //[HttpGet]
+        [HttpGet]
         //[Authorize]
-        //[AllowAnonymous]
-        //public ActionResult GetUsers()
-        //{
-        //    try
-        //    {
-        //        var users = _IUsersRepository.GetUsers();
-        //        return Ok(users);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(new { message = ex.Message });
-        //    }
-        //}
+        [AllowAnonymous]
+        public async Task<IActionResult> GetUsers()
+        {
+            var user = await _IUsersRepository.GetUsersAsync(); // Debes tener este método en tu repositorio
+
+            if (user == null)
+            {
+                return NotFound();
+            }
+
+            return Ok(user);
+        }
 
         [HttpGet("{id}")]
-        [Authorize]
+        //[Authorize]
         [AllowAnonymous]
         public async Task<IActionResult> GetUserById(int id)
         {
@@ -73,7 +72,7 @@ namespace APIUserValidation.Controllers
                 var createdUser = await _IUsersRepository.CreateUserAsync(userDto);
 
                 // Devuelves una respuesta con el usuario creado
-                return CreatedAtAction(nameof(GetUserById), new { id = createdUser.Id }, createdUser);
+                return CreatedAtAction(nameof(GetUserById), new { id = createdUser }, createdUser);
             }
             catch (Exception ex)
             {

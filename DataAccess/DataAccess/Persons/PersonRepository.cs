@@ -90,7 +90,6 @@ namespace ApiUserValidation.Data.DataAccess.Persons
                     person.GenderId,
                     person.Age,
                     person.Birthday,
-                    person.UserId,
                     person.Email,
                     person.Phone
                 };
@@ -137,7 +136,6 @@ namespace ApiUserValidation.Data.DataAccess.Persons
                     person.GenderId,
                     person.Age,
                     person.Birthday,
-                    person.UserId,
                     person.Email,
                     person.Phone
                 };
@@ -163,7 +161,6 @@ namespace ApiUserValidation.Data.DataAccess.Persons
                 Birthday = personDto.Birthday,
                 Email = personDto.Email,
                 Phone = personDto.Phone,
-                UserId = personDto.UserId
             };
         }
 

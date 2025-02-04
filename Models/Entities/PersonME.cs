@@ -55,8 +55,8 @@ namespace ApiUserValidation.Models.Entities
             return age;
         }
 
-        [Column("UserId")] // Nombre exacto en SQL
-        public int? UserId { get; set; }
+        //[Column("UserId")] // Nombre exacto en SQL
+        //public int? UserId { get; set; }
 
         [Column("Email")] // Nombre exacto en SQL
         public string Email { get; set; }
@@ -64,7 +64,7 @@ namespace ApiUserValidation.Models.Entities
         [Column("Phone")] // Nombre exacto en SQL
         public string Phone { get; set; }
 
-        [JsonIgnore] 
+        [JsonIgnore]
         public UserME? UserInfo { get; set; }  // Relación de uno a uno
     }
 }

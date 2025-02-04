@@ -12,6 +12,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -35,6 +36,35 @@ namespace DataAccess.DataAccessUsers
         {
             return new SqlConnection(_connectionString.ConnectionString);
         }
+
+
+        public async Task<UserResponseDTO> GetUsersAsync()
+        {
+            try
+            {
+                await using var dbConnection = DBConnection();
+                await dbConnection.OpenAsync();
+
+                string storedProcedure = "[UVA].[SP_GET_USERS]";
+
+                var person = await dbConnection.QueryFirstOrDefaultAsync<UserResponseDTO>(
+                    storedProcedure,
+                    commandType: CommandType.StoredProcedure
+                );
+
+                if (person == null)
+                {
+                    throw new Exception("Client not found.");
+                }
+
+                return person;
+            }
+            catch (Exception ex)
+            {
+                throw ExceptionHandler.HandleException(ex);
+            }
+        }
+
 
         public async Task<UserResponseDTO> GetUserByIdAsync(int personId)
         {
@@ -82,28 +112,82 @@ namespace DataAccess.DataAccessUsers
         //    return _mapper.Map<UserResponseDTO>(user);
         //}
 
-        public async Task<UserResponseDTO> CreateUserAsync(UserCreateDTO userDto)
+        public async Task<int> CreateUserAsync(UserCreateDTO userDto)
         {
-            var user = new UserME
+            try
             {
-                UserName = userDto.UserName,
-                Email = userDto.Email,
-                Phone = userDto.Phone,
+                var user = MapPersonDTOToEntity(userDto);
+                user.SetPassword(userDto.Password); // Hash de la contraseña
+
+                var parameters = new
+                {
+                    user.IdentificationId,
+                    user.IdentificationNumber,
+                    user.ClientName,
+                    user.ClientLastName,
+                    user.GenderId,
+                    user.Age,
+                    user.Birthday,
+                    user.Email,
+                    user.Phone,
+                    user.RolId,
+                    user.StatusId,
+                    user.UserName,
+                    UserPasswordHash = user.UserPasswordHash // Guardar solo el hash
+                };
+
+                await using var dbConnection = DBConnection();
+                await dbConnection.OpenAsync();
+
+                // Ejecutar el procedimiento almacenado y recuperar el ID insertado
+                int newPersonId = await dbConnection.QuerySingleAsync<int>(
+                    "[UVA].[SP_INSERT_USER]",
+                    parameters,
+                    commandType: CommandType.StoredProcedure
+                );
+
+                return newPersonId; // Devuelve el ID de la persona creada
+            }
+            catch (Exception ex)
+            {
+                throw ExceptionHandler.HandleException(ex);
+            }
+        }
+
+        private UserME MapPersonDTOToEntity(UserCreateDTO userDto)
+        {
+            return new UserME
+            {
+                IdentificationId = userDto.IdentificationId,
                 IdentificationNumber = userDto.IdentificationNumber,
                 ClientName = userDto.ClientName,
                 ClientLastName = userDto.ClientLastName,
+                GenderId = userDto.GenderId,
+                Age = CalculateAge(userDto.Birthday), // Calculamos la edad aquí
                 Birthday = userDto.Birthday,
-                RoleId = userDto.RoleId,
-                StatusId = userDto.StatusId
+                Email = userDto.Email,
+                Phone = userDto.Phone,
+                RolId = userDto.RolId,
+                StatusId = userDto.StatusId,
+                UserName = userDto.UserName,
             };
-
-            user.SetPassword(userDto.Password); // Usamos el método SetPassword para asignar el hash de la contraseña
-
-            _context.Users.Add(user);
-            await _context.SaveChangesAsync();
-
-            return _mapper.Map<UserResponseDTO>(user);
         }
+
+        private int CalculateAge(DateTime birthDate)
+        {
+            var today = DateTime.Today;
+            int age = today.Year - birthDate.Year;
+
+            // Ajustar si la fecha de cumpleaños aún no ha pasado en este año
+            if (birthDate.Date > today.AddYears(-age))
+            {
+                age--;
+            }
+
+            return age;
+        }
+
+
     }
 }
 

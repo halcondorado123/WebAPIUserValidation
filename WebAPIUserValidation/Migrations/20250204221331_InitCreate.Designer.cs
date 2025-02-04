@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace APIUserValidation.Migrations
 {
     [DbContext(typeof(WebAppDbContext))]
-    [Migration("20250204033803_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250204221331_InitCreate")]
+    partial class InitCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,8 +29,11 @@ namespace APIUserValidation.Migrations
             modelBuilder.Entity("ApiUserValidation.Models.Entities.PersonME", b =>
                 {
                     b.Property<int>("PersonId")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
                         .HasColumnName("PersonId");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PersonId"));
 
                     b.Property<int>("Age")
                         .HasColumnType("int")
@@ -69,10 +72,6 @@ namespace APIUserValidation.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("Phone");
-
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int")
-                        .HasColumnName("UserId");
 
                     b.Property<int?>("UserInfoPersonId")
                         .HasColumnType("int");
@@ -180,9 +179,12 @@ namespace APIUserValidation.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("LastLogin");
 
-                    b.Property<int?>("RoleId")
+                    b.Property<int?>("RolId")
                         .HasColumnType("int")
                         .HasColumnName("RolId");
+
+                    b.Property<int?>("RoleRolID")
+                        .HasColumnType("int");
 
                     b.Property<int>("StatusId")
                         .HasColumnType("int")
@@ -202,7 +204,7 @@ namespace APIUserValidation.Migrations
                         .HasColumnType("varchar(200)")
                         .HasColumnName("UserPasswordHash");
 
-                    b.HasIndex("RoleId");
+                    b.HasIndex("RoleRolID");
 
                     b.HasIndex("StatusId");
 
@@ -240,7 +242,7 @@ namespace APIUserValidation.Migrations
 
                     b.HasOne("ApiUserValidation.Models.Entities.UserAttributesME.RoleME", "Role")
                         .WithMany()
-                        .HasForeignKey("RoleId");
+                        .HasForeignKey("RoleRolID");
 
                     b.HasOne("ApiUserValidation.Models.Entities.UserAttributesME.StatusME", "Status")
                         .WithMany()

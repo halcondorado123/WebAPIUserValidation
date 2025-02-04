@@ -10,8 +10,9 @@ namespace ApiUserValidation.Data.DataAccess.Users
 {
     public interface IUsersRepository
     {
-        Task<UserResponseDTO> GetUserByIdAsync(int id);
-        Task<UserResponseDTO> CreateUserAsync(UserCreateDTO UserDto);
+        Task<UserResponseDTO> GetUsersAsync();
+        Task<UserResponseDTO> GetUserByIdAsync(int personId);
+        Task<int> CreateUserAsync(UserCreateDTO userDto);
         //List<UserME> GetUsers();
         //UserME GetUserById(int id);
         //int CreateUser(UserME user);

@@ -2,6 +2,7 @@
 using ApiUserValidation.Models.Entities;
 using ApiUserValidation.Models.Entities.UserAttributesME;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace ApiUserValidation.Data.Context
 {
@@ -27,10 +28,10 @@ namespace ApiUserValidation.Data.Context
                 .ToTable("UserME", "UVA") // Especificamos el esquema y nombre de la tabla
                 .HasBaseType<PersonME>();  // Configuramos la herencia
 
-            // Especificamos que el PersonId no se generará automáticamente
-            modelBuilder.Entity<UserME>()
-                .Property(e => e.PersonId)
-                .ValueGeneratedNever();
+            // Configuración del campo PersonId como IDENTITY
+            modelBuilder.Entity<PersonME>()
+                .Property(p => p.PersonId)
+                .ValueGeneratedOnAdd();  // Esto es suficiente para que el valor sea generado automáticamente
 
             // Generación automática de IDs para otras tablas
             modelBuilder.Entity<GenderME>()
@@ -49,5 +50,7 @@ namespace ApiUserValidation.Data.Context
                 .Property(e => e.StatusId)
                 .ValueGeneratedOnAdd();
         }
+
+
     }
 }

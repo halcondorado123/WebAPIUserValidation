@@ -8,7 +8,6 @@ namespace ApiUserValidation.Models.DTOs
 {
     public class UserResponseDTO
     {
-        public int Id { get; set; }
         public int IdentificationId { get; set; }
         public string? IdentificationNumber { get; set; }
         public string? ClientName { get; set; }
@@ -21,6 +20,7 @@ namespace ApiUserValidation.Models.DTOs
         public int? RoleId { get; set; }
         public int StatusId { get; set; }
         public string UserName { get; set; } = string.Empty;
+        public int PersonId { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public DateTime? LastLogin { get; set; }

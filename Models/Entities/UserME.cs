@@ -23,7 +23,7 @@ namespace ApiUserValidation.Models.Entities
         }
 
         [Column("RolId")] // Nombre exacto en SQL
-        public int? RoleId { get; set; }
+        public int? RolId { get; set; }
 
         [JsonIgnore]
         public RoleME? Role { get; set; }

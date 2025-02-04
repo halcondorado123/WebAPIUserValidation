@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace APIUserValidation.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class InitCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -75,7 +75,8 @@ namespace APIUserValidation.Migrations
                 schema: "UVA",
                 columns: table => new
                 {
-                    PersonId = table.Column<int>(type: "int", nullable: false),
+                    PersonId = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     IdentificationId = table.Column<int>(type: "int", nullable: true),
                     IdentificationNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     ClientName = table.Column<string>(type: "nvarchar(max)", nullable: true),
@@ -83,7 +84,6 @@ namespace APIUserValidation.Migrations
                     GenderId = table.Column<int>(type: "int", nullable: true),
                     Age = table.Column<int>(type: "int", nullable: false),
                     Birthday = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: true),
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Phone = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     UserInfoPersonId = table.Column<int>(type: "int", nullable: true)
@@ -114,6 +114,7 @@ namespace APIUserValidation.Migrations
                     UserName = table.Column<string>(type: "varchar(100)", nullable: false),
                     UserPasswordHash = table.Column<string>(type: "varchar(200)", nullable: false),
                     RolId = table.Column<int>(type: "int", nullable: true),
+                    RoleRolID = table.Column<int>(type: "int", nullable: true),
                     StatusId = table.Column<int>(type: "int", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "datetime2", nullable: true),
@@ -130,8 +131,8 @@ namespace APIUserValidation.Migrations
                         principalColumn: "PersonId",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_UserME_RoleME_RolId",
-                        column: x => x.RolId,
+                        name: "FK_UserME_RoleME_RoleRolID",
+                        column: x => x.RoleRolID,
                         principalSchema: "UVA",
                         principalTable: "RoleME",
                         principalColumn: "RolId");
@@ -163,10 +164,10 @@ namespace APIUserValidation.Migrations
                 column: "UserInfoPersonId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_UserME_RolId",
+                name: "IX_UserME_RoleRolID",
                 schema: "UVA",
                 table: "UserME",
-                column: "RolId");
+                column: "RoleRolID");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserME_StatusId",
