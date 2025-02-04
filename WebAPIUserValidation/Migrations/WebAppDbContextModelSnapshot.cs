@@ -4,19 +4,16 @@ using ApiUserValidation.Data.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
 namespace APIUserValidation.Migrations
 {
-    [DbContext(typeof(ApiUserValidation.Data.Context.WebAppDbContext))]
-    [Migration("20250130210923_InitCreate")]
-    partial class InitCreate
+    [DbContext(typeof(WebAppDbContext))]
+    partial class WebAppDbContextModelSnapshot : ModelSnapshot
     {
-        /// <inheritdoc />
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -29,11 +26,8 @@ namespace APIUserValidation.Migrations
             modelBuilder.Entity("ApiUserValidation.Models.Entities.PersonME", b =>
                 {
                     b.Property<int>("PersonId")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("int")
-                        .HasColumnName("ClientId");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("PersonId"));
+                        .HasColumnName("PersonId");
 
                     b.Property<int>("Age")
                         .HasColumnType("int")
@@ -51,6 +45,11 @@ namespace APIUserValidation.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("ClientName");
 
+                    b.Property<string>("Email")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Email");
+
                     b.Property<int?>("GenderId")
                         .HasColumnType("int")
                         .HasColumnName("GenderId");
@@ -63,15 +62,25 @@ namespace APIUserValidation.Migrations
                         .HasColumnType("nvarchar(max)")
                         .HasColumnName("IdentificationNumber");
 
-                    b.Property<int>("UserId")
+                    b.Property<string>("Phone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("Phone");
+
+                    b.Property<int?>("UserId")
                         .HasColumnType("int")
                         .HasColumnName("UserId");
+
+                    b.Property<int?>("UserInfoPersonId")
+                        .HasColumnType("int");
 
                     b.HasKey("PersonId");
 
                     b.HasIndex("GenderId");
 
                     b.HasIndex("IdentificationId");
+
+                    b.HasIndex("UserInfoPersonId");
 
                     b.ToTable("PersonME", "UVA");
 
@@ -156,14 +165,9 @@ namespace APIUserValidation.Migrations
                     b.ToTable("StatusME", "UVA");
                 });
 
-            modelBuilder.Entity("ApiUserValidation.Models.Entities.UserInfoME", b =>
+            modelBuilder.Entity("ApiUserValidation.Models.Entities.UserME", b =>
                 {
-                    b.Property<int>("UserId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasColumnName("UserId");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
+                    b.HasBaseType("ApiUserValidation.Models.Entities.PersonME");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2")
@@ -173,9 +177,13 @@ namespace APIUserValidation.Migrations
                         .HasColumnType("datetime2")
                         .HasColumnName("LastLogin");
 
-                    b.Property<int?>("PersonId")
+                    b.Property<int?>("RoleId")
                         .HasColumnType("int")
-                        .HasColumnName("PersonId");
+                        .HasColumnName("RolId");
+
+                    b.Property<int>("StatusId")
+                        .HasColumnType("int")
+                        .HasColumnName("StatusId");
 
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2")
@@ -191,26 +199,11 @@ namespace APIUserValidation.Migrations
                         .HasColumnType("varchar(200)")
                         .HasColumnName("UserPasswordHash");
 
-                    b.HasKey("UserId");
-
-                    b.HasIndex("PersonId")
-                        .IsUnique()
-                        .HasFilter("[PersonId] IS NOT NULL");
-
-                    b.ToTable("UserInfoME", "UVA");
-                });
-
-            modelBuilder.Entity("ApiUserValidation.Models.Entities.ClientME", b =>
-                {
-                    b.HasBaseType("ApiUserValidation.Models.Entities.PersonME");
-
-                    b.Property<int?>("RoleId")
-                        .HasColumnType("int")
-                        .HasColumnName("RolId");
-
                     b.HasIndex("RoleId");
 
-                    b.ToTable("ClientME", "UVA");
+                    b.HasIndex("StatusId");
+
+                    b.ToTable("UserME", "UVA");
                 });
 
             modelBuilder.Entity("ApiUserValidation.Models.Entities.PersonME", b =>
@@ -223,40 +216,38 @@ namespace APIUserValidation.Migrations
                         .WithMany()
                         .HasForeignKey("IdentificationId");
 
+                    b.HasOne("ApiUserValidation.Models.Entities.UserME", "UserInfo")
+                        .WithMany()
+                        .HasForeignKey("UserInfoPersonId");
+
                     b.Navigation("Gender");
 
                     b.Navigation("Identification");
+
+                    b.Navigation("UserInfo");
                 });
 
-            modelBuilder.Entity("ApiUserValidation.Models.Entities.UserInfoME", b =>
-                {
-                    b.HasOne("ApiUserValidation.Models.Entities.PersonME", "Person")
-                        .WithOne("UserInfo")
-                        .HasForeignKey("ApiUserValidation.Models.Entities.UserInfoME", "PersonId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.Navigation("Person");
-                });
-
-            modelBuilder.Entity("ApiUserValidation.Models.Entities.ClientME", b =>
+            modelBuilder.Entity("ApiUserValidation.Models.Entities.UserME", b =>
                 {
                     b.HasOne("ApiUserValidation.Models.Entities.PersonME", null)
                         .WithOne()
-                        .HasForeignKey("ApiUserValidation.Models.Entities.ClientME", "PersonId")
+                        .HasForeignKey("ApiUserValidation.Models.Entities.UserME", "PersonId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("ApiUserValidation.Models.Entities.UserAttributesME.RoleME", "Role")
                         .WithMany()
-                        .HasForeignKey("RoleId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .HasForeignKey("RoleId");
+
+                    b.HasOne("ApiUserValidation.Models.Entities.UserAttributesME.StatusME", "Status")
+                        .WithMany()
+                        .HasForeignKey("StatusId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Role");
-                });
 
-            modelBuilder.Entity("ApiUserValidation.Models.Entities.PersonME", b =>
-                {
-                    b.Navigation("UserInfo");
+                    b.Navigation("Status");
                 });
 #pragma warning restore 612, 618
         }

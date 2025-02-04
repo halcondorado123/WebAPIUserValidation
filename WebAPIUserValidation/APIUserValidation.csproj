@@ -8,9 +8,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Modules\Injection\**" />
 	  <Compile Remove="Security\**" />
+	  <Content Remove="Modules\Injection\**" />
 	  <Content Remove="Security\**" />
+	  <EmbeddedResource Remove="Modules\Injection\**" />
 	  <EmbeddedResource Remove="Security\**" />
+	  <None Remove="Modules\Injection\**" />
 	  <None Remove="Security\**" />
 	</ItemGroup>
 	
@@ -33,11 +37,6 @@
   <ItemGroup>
     <ProjectReference Include="..\ApiUserValidation.Services\ApiUserValidation.Services.csproj" />
     <ProjectReference Include="..\DataAccess\ApiUserValidation.Data.csproj" />
-    <ProjectReference Include="..\Models\ApiUserValidation.Models.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Modules\Injection\" />
   </ItemGroup>
 
 </Project>

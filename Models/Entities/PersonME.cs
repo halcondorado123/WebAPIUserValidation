@@ -65,6 +65,6 @@ namespace ApiUserValidation.Models.Entities
         public string Phone { get; set; }
 
         [JsonIgnore] 
-        public UserInfoME? UserInfo { get; set; }  // Relación de uno a uno
+        public UserME? UserInfo { get; set; }  // Relación de uno a uno
     }
 }

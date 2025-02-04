@@ -7,19 +7,26 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="DTOs\ApiModelDTO\**" />
+    <Compile Remove="DTOs\TokenDTO\**" />
+    <Compile Remove="ViewModels\**" />
+    <EmbeddedResource Remove="DTOs\ApiModelDTO\**" />
+    <EmbeddedResource Remove="DTOs\TokenDTO\**" />
+    <EmbeddedResource Remove="ViewModels\**" />
+    <None Remove="DTOs\ApiModelDTO\**" />
+    <None Remove="DTOs\TokenDTO\**" />
+    <None Remove="ViewModels\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
+    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="8.0.8" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="8.0.8">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="DTOs\ApiModelDTO\" />
-    <Folder Include="DTOs\TokenDTO\" />
-    <Folder Include="ViewModels\" />
   </ItemGroup>
 
 </Project>

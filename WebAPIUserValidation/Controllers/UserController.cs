@@ -1,6 +1,7 @@
 ﻿using ApiUserValidation.Data.DataAccess.Users;
 using ApiUserValidation.Models.DTOs;
 using ApiUserValidation.Models.Entities;
+using DataAccess.DataAccessUsers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
@@ -13,112 +14,105 @@ namespace APIUserValidation.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController : Controller
+    public class UsersController : ControllerBase
     {
-
         private readonly IUsersRepository _IUsersRepository;
-        public IConfiguration _configuration;
+        private readonly IConfiguration _configuration;
 
-        public UserController(IUsersRepository userRepository, IConfiguration configuration)
+        public UsersController(IUsersRepository usersRepository, IConfiguration configuration)
         {
-            _IUsersRepository = userRepository;
+            _IUsersRepository = usersRepository;
             _configuration = configuration;
         }
 
-        [ApiController]
-        [Route("api/[controller]")]
-        public class UsersController : ControllerBase
+        //[HttpGet]
+        //[Authorize]
+        //[AllowAnonymous]
+        //public ActionResult GetUsers()
+        //{
+        //    try
+        //    {
+        //        var users = _IUsersRepository.GetUsers();
+        //        return Ok(users);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new { message = ex.Message });
+        //    }
+        //}
+
+        [HttpGet("{id}")]
+        [Authorize]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetUserById(int id)
         {
-            private readonly IUsersRepository _IUsersRepository;
-            private readonly IConfiguration _configuration;
+            var user = await _IUsersRepository.GetUserByIdAsync(id); // Debes tener este método en tu repositorio
 
-            public UsersController(IUsersRepository usersRepository, IConfiguration configuration)
+            if (user == null)
             {
-                _IUsersRepository = usersRepository;
-                _configuration = configuration;
+                return NotFound();
             }
 
-            [HttpGet]
-            [Authorize]
-            [AllowAnonymous]
-            public ActionResult GetUsers()
+            return Ok(user);
+        }
+
+
+        [HttpPost]
+        [Authorize]
+        [AllowAnonymous]
+        public async Task<IActionResult> CreateUser([FromBody] UserCreateDTO userDto)
+        {
+            if (userDto == null)
             {
-                try
-                {
-                    var users = _IUsersRepository.GetUsers();
-                    return Ok(users);
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(new { message = ex.Message });
-                }
+                return BadRequest("User data is null");
             }
 
-            [HttpGet("{id}")]
-            [Authorize]
-            [AllowAnonymous]
-            public ActionResult GetUserById(int id)
+            try
             {
-                try
-                {
-                    var user = _IUsersRepository.GetUserById(id);
-                    if (user == null) return NotFound(); // Manejo de usuario no encontrado
+                // Llamas al método CreateUserAsync del repositorio
+                var createdUser = await _IUsersRepository.CreateUserAsync(userDto);
 
-                    return Ok(user);
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(new { message = ex.Message });
-                }
+                // Devuelves una respuesta con el usuario creado
+                return CreatedAtAction(nameof(GetUserById), new { id = createdUser.Id }, createdUser);
             }
-
-            [HttpPost]
-            [Authorize]
-            [AllowAnonymous]
-            public ActionResult CreateUser([FromBody] UserInfoME user)
+            catch (Exception ex)
             {
-                try
-                {
-                    var createdUser = _IUsersRepository.CreateUser(user);
-                    return Ok(createdUser);
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(new { message = ex.Message });
-                }
-            }
-
-            [HttpPut]
-            [Authorize]
-            [AllowAnonymous]
-            public ActionResult ModifyUser([FromBody] UserInfoME user)
-            {
-                try
-                {
-                    var modifiedUser = _IUsersRepository.UpdateUser(user);
-                    return Ok(modifiedUser);
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(new { message = ex.Message });
-                }
-            }
-
-            [HttpDelete("{id}")]
-            [Authorize]
-            [AllowAnonymous]
-            public ActionResult DeleteUser(int id)
-            {
-                try
-                {
-                    var result = _IUsersRepository.DeleteUser(id);
-                    return Ok(result);
-                }
-                catch (Exception ex)
-                {
-                    return BadRequest(new { message = ex.Message });
-                }
+                return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+
+        //[HttpPut]
+        //[Authorize]
+        //[AllowAnonymous]
+        //public ActionResult ModifyUser([FromBody] UserME user)
+        //{
+        //    try
+        //    {
+        //        var modifiedUser = _IUsersRepository.UpdateUser(user);
+        //        return Ok(modifiedUser);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new { message = ex.Message });
+        //    }
+        //}
+
+        //[HttpDelete("{id}")]
+        //[Authorize]
+        //[AllowAnonymous]
+        //public ActionResult DeleteUser(int id)
+        //{
+        //    try
+        //    {
+        //        var result = _IUsersRepository.DeleteUser(id);
+        //        return Ok(result);
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        return BadRequest(new { message = ex.Message });
+        //    }
+        //}
     }
 }
+

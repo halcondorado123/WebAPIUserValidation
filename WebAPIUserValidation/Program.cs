@@ -6,12 +6,17 @@ using APIUserValidation.Modules.Mapper;
 using ApiUserValidation.Data.Context;
 using ApiUserValidation.Data.Configuration;
 using ApiUserValidation.Data.DataAccess.Persons;
+using ApiUserValidation.Services.Services;
+using ApiUserValidation.Data.DataAccess.Users;
+using DataAccess.DataAccessUsers;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Configuración de servicios
 builder.Services.AddCors();
 builder.Services.AddSingleton(new ConfigurationData(builder.Configuration.GetConnectionString("SQLConnection")));
+
+builder.Services.AddAutoMapper(typeof(MappingProfile));
 
 // Configuración de la base de datos
 builder.Services.AddDbContext<WebAppDbContext>(options =>
@@ -25,6 +30,7 @@ builder.Services.AddDbContext<WebAppDbContext>(options =>
 //builder.Services.AddScoped<IClientsRepository, ClientsRepository>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<IPersonRepository, PersonRepository>();
+builder.Services.AddScoped<IUsersRepository, UsersRepository>();
 builder.Services.AddControllers();
 
 // MODULES

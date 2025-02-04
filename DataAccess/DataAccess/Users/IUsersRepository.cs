@@ -10,11 +10,13 @@ namespace ApiUserValidation.Data.DataAccess.Users
 {
     public interface IUsersRepository
     {
-        List<UserInfoME> GetUsers();
-        UserInfoME GetUserById(int id);
-        int CreateUser(UserInfoME user);
-        UserInfoME ValidateUser(UserInfoME usuario);
-        bool UpdateUser(UserInfoME user);
-        bool DeleteUser(int id); // Opcional, si necesitas eliminar usuarios
+        Task<UserResponseDTO> GetUserByIdAsync(int id);
+        Task<UserResponseDTO> CreateUserAsync(UserCreateDTO UserDto);
+        //List<UserME> GetUsers();
+        //UserME GetUserById(int id);
+        //int CreateUser(UserME user);
+        //UserME ValidateUser(UserME usuario);
+        //bool UpdateUser(UserME user);
+        //bool DeleteUser(int id); // Opcional, si necesitas eliminar usuarios
     }
 }

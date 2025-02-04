@@ -8,9 +8,8 @@ namespace ApiUserValidation.Data.Context
     public class WebAppDbContext : DbContext
     {
         public WebAppDbContext(DbContextOptions<WebAppDbContext> options) : base(options) { }
-        public DbSet<ClientME> Clients { get; set; }
         public DbSet<PersonME> People { get; set; }
-        public DbSet<UserInfoME> UserInfo { get; set; }
+        public DbSet<UserME> Users { get; set; }
         public DbSet<GenderME>? Gender { get; set; }
         public DbSet<IdentificationME>? Identification { get; set; }
         public DbSet<RoleME>? Role { get; set; }
@@ -20,41 +19,35 @@ namespace ApiUserValidation.Data.Context
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.HasDefaultSchema("UVA"); // O el esquema que desees
+            // Esquema por defecto
+            modelBuilder.HasDefaultSchema("UVA");
 
-            modelBuilder.Entity<ClientME>()
-                .HasOne(c => c.Role)
-                .WithMany()  // Relación de muchos a uno
-                .HasForeignKey(c => c.RoleId)
-                .OnDelete(DeleteBehavior.Restrict);  // Asegura que no se elimine en cascada
+            // Configuración de tablas específicas
+            modelBuilder.Entity<UserME>()
+                .ToTable("UserME", "UVA") // Especificamos el esquema y nombre de la tabla
+                .HasBaseType<PersonME>();  // Configuramos la herencia
 
-            modelBuilder.Entity<UserInfoME>()
-                .HasOne(u => u.Person)
-                .WithOne(p => p.UserInfo)  // Relación de uno a uno
-                .OnDelete(DeleteBehavior.SetNull);  // Esto evitaría la eliminación en cascada
+            // Especificamos que el PersonId no se generará automáticamente
+            modelBuilder.Entity<UserME>()
+                .Property(e => e.PersonId)
+                .ValueGeneratedNever();
 
-            modelBuilder.Entity<UserInfoME>()
-                .HasOne(u => u.Person)
-                .WithOne(p => p.UserInfo)  // Relación de uno a uno
-                .HasForeignKey<UserInfoME>(u => u.PersonId)
-                .OnDelete(DeleteBehavior.Cascade);  // Eliminar en cascada al eliminar la persona
-
+            // Generación automática de IDs para otras tablas
             modelBuilder.Entity<GenderME>()
-           .Property(e => e.GenderId)
-           .ValueGeneratedOnAdd(); // Esto asegura que se genere automáticamente
+                .Property(e => e.GenderId)
+                .ValueGeneratedOnAdd();
 
             modelBuilder.Entity<IdentificationME>()
-           .Property(e => e.IdentificationId)
-           .ValueGeneratedOnAdd(); // Esto asegura que se genere automáticamente
+                .Property(e => e.IdentificationId)
+                .ValueGeneratedOnAdd();
 
             modelBuilder.Entity<RoleME>()
-           .Property(e => e.RolID)
-           .ValueGeneratedOnAdd(); // Esto asegura que se genere automáticamente
+                .Property(e => e.RolID)
+                .ValueGeneratedOnAdd();
 
             modelBuilder.Entity<StatusME>()
-           .Property(e => e.StatusId)
-           .ValueGeneratedOnAdd(); // Esto asegura que se genere automáticamente
-
+                .Property(e => e.StatusId)
+                .ValueGeneratedOnAdd();
         }
     }
 }
