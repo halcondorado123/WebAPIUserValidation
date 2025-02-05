@@ -63,8 +63,6 @@ namespace ApiUserValidation.Models.Entities
 
         [Column("Phone")] // Nombre exacto en SQL
         public string Phone { get; set; }
-
-        [JsonIgnore]
         public UserME? UserInfo { get; set; }  // Relación de uno a uno
     }
 }

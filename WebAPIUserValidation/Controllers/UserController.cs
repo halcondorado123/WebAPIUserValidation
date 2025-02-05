@@ -80,7 +80,7 @@ namespace APIUserValidation.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPut("Insert_user_to_existing_person")]
         [Authorize]
         [AllowAnonymous]
         public async Task<IActionResult> InsertUserToExistingPerson([FromBody] UserCreateDTO userDto)
@@ -101,21 +101,28 @@ namespace APIUserValidation.Controllers
         }
 
 
-        //[HttpPut]
-        //[Authorize]
-        //[AllowAnonymous]
-        //public ActionResult ModifyUser([FromBody] UserME user)
-        //{
-        //    try
-        //    {
-        //        var modifiedUser = _IUsersRepository.UpdateUser(user);
-        //        return Ok(modifiedUser);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(new { message = ex.Message });
-        //    }
-        //}
+        [HttpPut("Update_user")]
+        [Authorize]
+        [AllowAnonymous]
+        public async Task<IActionResult> UpdateUser([FromBody] UserCreateDTO userDto)
+        {
+            try
+            {
+                int affectedRows = await _IUsersRepository.UpdateUserAsync(userDto);
+                if (affectedRows > 0)
+                {
+                    return Ok(new { message = "Usuario actualizado correctamente." });
+                }
+                else
+                {
+                    return NotFound(new { message = "No se encontraron registros para actualizar." });
+                }
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Ocurrió un error al actualizar el usuario.", error = ex.Message });
+            }
+        }
 
         //[HttpDelete("{id}")]
         //[Authorize]

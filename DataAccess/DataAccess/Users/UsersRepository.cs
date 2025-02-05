@@ -6,17 +6,9 @@ using ApiUserValidation.Models.DTOs;
 using ApiUserValidation.Models.Entities;
 using AutoMapper;
 using Dapper;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.Data;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DataAccess.DataAccessUsers
 {
@@ -95,61 +87,6 @@ namespace DataAccess.DataAccessUsers
             }
         }
 
-        public async Task<UserResponseDTO> AddUserToExistingPersonAsync(UserCreateDTO userDto)
-        {
-            try
-            {
-                await using var dbConnection = DBConnection();
-                await dbConnection.OpenAsync();
-
-                string storedProcedure = "[UVA].[SP_INSERT_USER_TO_EXISTING_PERSON]";
-
-                var userWithPersonInfo = await dbConnection.QueryFirstOrDefaultAsync<UserResponseDTO>(
-                    storedProcedure,
-                    new
-                    {
-                        userDto.PersonId,
-                        userDto.UserName,
-                        UserPasswordHash = userDto.Password, // Guardar solo el hash, // Ya debe estar hasheada antes de enviarla
-                        userDto.RolId,
-                        userDto.StatusId,
-                        userDto.CreatedAt,
-                        userDto.UpdatedAt,
-                        LastLogin = (DateTime?)null // O la fecha actual si lo prefieres
-                    },
-                    commandType: CommandType.StoredProcedure
-                );
-
-                if (userWithPersonInfo == null)
-                {
-                    throw new Exception("No se pudo insertar el usuario o la persona no existe.");
-                }
-
-                return userWithPersonInfo;
-            }
-            catch (Exception ex)
-            {
-                throw ExceptionHandler.HandleException(ex);
-            }
-        }
-
-        //public async Task<UserResponseDTO> GetUserByIdAsync(int id)
-        //{
-        //    // Busca el usuario por su ID
-        //    var user = await _context.Users
-        //        .Where(u => u.UserId == id)
-        //        .FirstOrDefaultAsync();
-
-        //    // Si el usuario no existe, retorna null
-        //    if (user == null)
-        //    {
-        //        return null;
-        //    }
-
-        //    // Mapea el usuario encontrado a UserResponseDTO y lo retorna
-        //    return _mapper.Map<UserResponseDTO>(user);
-        //}
-
         public async Task<int> CreateUserAsync(UserCreateDTO userDto)
         {
             try
@@ -195,27 +132,120 @@ namespace DataAccess.DataAccessUsers
             }
         }
 
+        public async Task<UserResponseDTO> AddUserToExistingPersonAsync(UserCreateDTO userDto)
+        {
+            try
+            {
+                await using var dbConnection = DBConnection();
+                await dbConnection.OpenAsync();
+
+                string storedProcedure = "[UVA].[SP_INSERT_USER_TO_EXISTING_PERSON]";
+
+                var userWithPersonInfo = await dbConnection.QueryFirstOrDefaultAsync<UserResponseDTO>(
+                    storedProcedure,
+                    new
+                    {
+                        userDto.PersonId,
+                        userDto.UserName,
+                        UserPasswordHash = userDto.Password, // Guardar solo el hash, // Ya debe estar hasheada antes de enviarla
+                        userDto.RolId,
+                        userDto.StatusId,
+                        userDto.CreatedAt,
+                        userDto.UpdatedAt,
+                        LastLogin = (DateTime?)null // O la fecha actual si lo prefieres
+                    },
+                    commandType: CommandType.StoredProcedure
+                );
+
+                if (userWithPersonInfo == null)
+                {
+                    throw new Exception("No se pudo insertar el usuario o la persona no existe.");
+                }
+
+                return userWithPersonInfo;
+            }
+            catch (Exception ex)
+            {
+                throw ExceptionHandler.HandleException(ex);
+            }
+        }
+
+        public async Task<int> UpdateUserAsync(UserCreateDTO userDto)
+        {
+            try
+            {
+                var user = MapPersonDTOToEntity(userDto);
+                user.UpdatedAt = DateTime.UtcNow;
+
+                var parameters = new
+                {
+                    user.PersonId,
+                    user.IdentificationId,
+                    user.IdentificationNumber,
+                    user.ClientName,
+                    user.ClientLastName,
+                    user.GenderId,
+                    user.Age,
+                    user.Birthday,
+                    user.Email,
+                    user.Phone,
+                    user.UserName,
+                    user.RolId,
+                    user.StatusId,
+                    UserPasswordHash = user.UserPasswordHash, // Solo si la contraseña se ha cambiado
+                    user.UpdatedAt,
+                    user.LastLogin
+                };
+
+                await using var dbConnection = DBConnection();
+                await dbConnection.OpenAsync();
+
+                // Ejecutar el procedimiento almacenado para actualizar el usuario
+                int affectedRows = await dbConnection.ExecuteAsync(
+                    "[UVA].[SP_UPDATE_USER]",
+                    parameters,
+                    commandType: CommandType.StoredProcedure
+                );
+
+                return affectedRows;
+            }
+            catch (Exception ex)
+            {
+                throw ExceptionHandler.HandleException(ex);
+            }
+        }
+
+
         private UserME MapPersonDTOToEntity(UserCreateDTO userDto)
         {
-            return new UserME
+            var user = new UserME
             {
+                PersonId = userDto.PersonId,
                 IdentificationId = userDto.IdentificationId,
                 IdentificationNumber = userDto.IdentificationNumber,
                 ClientName = userDto.ClientName,
                 ClientLastName = userDto.ClientLastName,
                 GenderId = userDto.GenderId,
-                Age = CalculateAge(userDto.Birthday), // Calculamos la edad aquí
+                Age = CalculateAge(userDto.Birthday),
                 Birthday = userDto.Birthday,
                 Email = userDto.Email,
                 Phone = userDto.Phone,
                 RolId = userDto.RolId,
                 StatusId = userDto.StatusId,
                 UserName = userDto.UserName,
-                CreatedAt = userDto.CreatedAt,
-                UpdatedAt = userDto.UpdatedAt,
+                UpdatedAt = DateTime.UtcNow,  // Actualizamos la fecha de modificación
                 LastLogin = userDto.LastLogin,
             };
+
+            // Si la contraseña se actualiza, la procesamos
+            if (!string.IsNullOrEmpty(userDto.Password))
+            {
+                user.SetPassword(userDto.Password);  // Hash de la nueva contraseña
+            }
+
+            return user;
         }
+
 
         private int CalculateAge(DateTime birthDate)
         {
@@ -230,8 +260,6 @@ namespace DataAccess.DataAccessUsers
 
             return age;
         }
-
-
     }
 }
 

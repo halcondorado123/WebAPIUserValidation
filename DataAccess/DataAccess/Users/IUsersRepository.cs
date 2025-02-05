@@ -14,8 +14,8 @@ namespace ApiUserValidation.Data.DataAccess.Users
         Task<UserResponseDTO> GetUserByIdAsync(int personId);
         Task<int> CreateUserAsync(UserCreateDTO userDto);
         Task<UserResponseDTO> AddUserToExistingPersonAsync(UserCreateDTO userDto);
+        Task<int> UpdateUserAsync(UserCreateDTO userDto);
 
-        //int CreateUser(UserME user);
         //UserME ValidateUser(UserME usuario);
         //bool UpdateUser(UserME user);
         //bool DeleteUser(int id); // Opcional, si necesitas eliminar usuarios
