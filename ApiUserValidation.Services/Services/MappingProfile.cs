@@ -32,7 +32,7 @@ namespace ApiUserValidation.Services.Services
             .ForMember(dest => dest.ClientLastName, opt => opt.MapFrom(src => src.ClientLastName))
             .ForMember(dest => dest.Age, opt => opt.MapFrom(src => src.CalculateAge()))
             .ForMember(dest => dest.Birthday, opt => opt.MapFrom(src => src.Birthday))
-            .ForMember(dest => dest.RoleId, opt => opt.MapFrom(src => src.RolId))
+            .ForMember(dest => dest.RolId, opt => opt.MapFrom(src => src.RolId))
             .ForMember(dest => dest.StatusId, opt => opt.MapFrom(src => src.StatusId));
             //.ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => src.CreatedAt))
             //.ForMember(dest => dest.UpdatedAt, opt => opt.MapFrom(src => src.UpdatedAt))

@@ -80,6 +80,26 @@ namespace APIUserValidation.Controllers
             }
         }
 
+        [HttpPut]
+        [Authorize]
+        [AllowAnonymous]
+        public async Task<IActionResult> InsertUserToExistingPerson([FromBody] UserCreateDTO userDto)
+        {
+            if (userDto == null)
+            {
+                return BadRequest("Datos de usuario inválidos.");
+            }
+
+            var user = await _IUsersRepository.AddUserToExistingPersonAsync(userDto);
+
+            if (user == null)
+            {
+                return NotFound($"No se encontró la persona con ID");
+            }
+
+            return CreatedAtAction(nameof(GetUserById), new { id = user.PersonId }, user);
+        }
+
 
         //[HttpPut]
         //[Authorize]

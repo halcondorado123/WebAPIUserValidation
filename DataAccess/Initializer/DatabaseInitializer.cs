@@ -15,8 +15,13 @@ public static class DatabaseInitializer
         using var scope = serviceProvider.CreateScope();
         var context = scope.ServiceProvider.GetRequiredService<ApiUserValidation.Data.Context.WebAppDbContext>();
 
-        // Aplicar migraciones si no están aplicadas
-        await context.Database.MigrateAsync();
+        var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
+
+        // Solo ejecutamos la migración si hay más de 1 migración pendiente
+        if (pendingMigrations.Count() > 1)
+        {
+            await context.Database.MigrateAsync();
+        }
 
         // Seed otros datos (Género, Identificación, Estado Civil)
         await SeedGendersAsync(context);

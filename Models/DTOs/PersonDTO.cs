@@ -22,6 +22,8 @@ namespace ApiUserValidation.Models.DTOs
         public DateTime Birthday { get; set; }
         public string Email {  get; set; }
         public string Phone { get; set;  }
+
+        [JsonIgnoreAttribute]
         public int? UserId { get; set; }  // ID para la relación con UserInfo
     }
 }

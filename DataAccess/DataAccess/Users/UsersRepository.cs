@@ -38,7 +38,7 @@ namespace DataAccess.DataAccessUsers
         }
 
 
-        public async Task<UserResponseDTO> GetUsersAsync()
+        public async Task<IEnumerable<UserResponseDTO>> GetUsersAsync()
         {
             try
             {
@@ -47,17 +47,17 @@ namespace DataAccess.DataAccessUsers
 
                 string storedProcedure = "[UVA].[SP_GET_USERS]";
 
-                var person = await dbConnection.QueryFirstOrDefaultAsync<UserResponseDTO>(
+                var persons = await dbConnection.QueryAsync<UserResponseDTO>(
                     storedProcedure,
                     commandType: CommandType.StoredProcedure
                 );
 
-                if (person == null)
+                if (persons == null)
                 {
                     throw new Exception("Client not found.");
                 }
 
-                return person;
+                return persons;
             }
             catch (Exception ex)
             {
@@ -88,6 +88,44 @@ namespace DataAccess.DataAccessUsers
                 }
 
                 return person;
+            }
+            catch (Exception ex)
+            {
+                throw ExceptionHandler.HandleException(ex);
+            }
+        }
+
+        public async Task<UserResponseDTO> AddUserToExistingPersonAsync(UserCreateDTO userDto)
+        {
+            try
+            {
+                await using var dbConnection = DBConnection();
+                await dbConnection.OpenAsync();
+
+                string storedProcedure = "[UVA].[SP_INSERT_USER_TO_EXISTING_PERSON]";
+
+                var userWithPersonInfo = await dbConnection.QueryFirstOrDefaultAsync<UserResponseDTO>(
+                    storedProcedure,
+                    new
+                    {
+                        userDto.PersonId,
+                        userDto.UserName,
+                        UserPasswordHash = userDto.Password, // Guardar solo el hash, // Ya debe estar hasheada antes de enviarla
+                        userDto.RolId,
+                        userDto.StatusId,
+                        userDto.CreatedAt,
+                        userDto.UpdatedAt,
+                        LastLogin = (DateTime?)null // O la fecha actual si lo prefieres
+                    },
+                    commandType: CommandType.StoredProcedure
+                );
+
+                if (userWithPersonInfo == null)
+                {
+                    throw new Exception("No se pudo insertar el usuario o la persona no existe.");
+                }
+
+                return userWithPersonInfo;
             }
             catch (Exception ex)
             {
@@ -133,6 +171,9 @@ namespace DataAccess.DataAccessUsers
                     user.RolId,
                     user.StatusId,
                     user.UserName,
+                    user.CreatedAt,
+                    user.UpdatedAt,
+                    user.LastLogin,
                     UserPasswordHash = user.UserPasswordHash // Guardar solo el hash
                 };
 
@@ -170,6 +211,9 @@ namespace DataAccess.DataAccessUsers
                 RolId = userDto.RolId,
                 StatusId = userDto.StatusId,
                 UserName = userDto.UserName,
+                CreatedAt = userDto.CreatedAt,
+                UpdatedAt = userDto.UpdatedAt,
+                LastLogin = userDto.LastLogin,
             };
         }
 

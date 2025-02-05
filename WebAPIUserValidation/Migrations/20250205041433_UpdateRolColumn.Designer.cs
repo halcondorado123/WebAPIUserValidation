@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace APIUserValidation.Migrations
 {
     [DbContext(typeof(WebAppDbContext))]
-    [Migration("20250204221331_InitCreate")]
-    partial class InitCreate
+    [Migration("20250205041433_UpdateRolColumn")]
+    partial class UpdateRolColumn
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

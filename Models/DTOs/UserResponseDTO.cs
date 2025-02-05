@@ -17,7 +17,7 @@ namespace ApiUserValidation.Models.DTOs
         public int? GenderId { get; set; }
         public DateTime Birthday { get; set; }
         public int Age { get; set; }
-        public int? RoleId { get; set; }
+        public int? RolId { get; set; }
         public int StatusId { get; set; }
         public string UserName { get; set; } = string.Empty;
         public int PersonId { get; set; }
