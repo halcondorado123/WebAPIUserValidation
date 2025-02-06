@@ -111,6 +111,54 @@ namespace ApiUserValidation.Data.DataAccess.Persons
             }
         }
 
+
+        public async Task<List<int>> BulkInsertPeopleAsync(List<PersonDTO> people)
+        {
+            var createdIds = new List<int>();
+
+            try
+            {
+                await using var dbConnection = DBConnection();
+                await dbConnection.OpenAsync();
+
+                // 🔥 Filtrar datos duplicados por IdentificationNumber y Email antes de insertar
+                var uniquePeople = people
+                    .GroupBy(p => new { p.IdentificationNumber, p.Email }) // Agrupar por identificación y correo
+                    .Select(g => g.First()) // Tomar solo el primer registro por grupo
+                    .ToList();
+
+                foreach (var person in uniquePeople)
+                {
+                    var parameters = new
+                    {
+                        person.IdentificationId,
+                        person.IdentificationNumber,
+                        person.ClientName,
+                        person.ClientLastName,
+                        person.GenderId,
+                        person.Age,
+                        person.Birthday,
+                        person.Email,
+                        person.Phone
+                    };
+
+                    int newPersonId = await dbConnection.QuerySingleAsync<int>(
+                        "[UVA].[SP_INSERT_PERSON]",
+                        parameters,
+                        commandType: CommandType.StoredProcedure
+                    );
+
+                    createdIds.Add(newPersonId);
+                }
+
+                return createdIds; // Retorna la lista de IDs creados
+            }
+            catch (Exception ex)
+            {
+                throw ExceptionHandler.HandleException(ex);
+            }
+        }
+
         public async Task UpdatePersonAsync(PersonDTO personDto)
         {
             try
@@ -148,6 +196,28 @@ namespace ApiUserValidation.Data.DataAccess.Persons
             }
         }
 
+        public async Task<int> DeletePersonAsync(int personId)
+        {
+            var parameters = new { PersonId = personId };
+
+            try
+            {
+                using (var dbConnection = DBConnection())
+                {
+                    await dbConnection.OpenAsync();
+
+                    // Ejecutar el SP y obtener las filas afectadas
+                    int affectedRows = await dbConnection.ExecuteScalarAsync<int>("[UVA].[SP_DELETE_PERSON]", parameters, commandType: CommandType.StoredProcedure);
+
+                    return affectedRows; // Retorna el número de filas eliminadas
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExceptionHandler.HandleException(ex);
+            }
+        }
+
         private PersonME MapPersonDTOToEntity(PersonDTO personDto)
         {
             return new PersonME
@@ -172,28 +242,6 @@ namespace ApiUserValidation.Data.DataAccess.Persons
                 using (var dbConnection = DBConnection())
                 {
                     await dbConnection.ExecuteAsync(storedProcedure, parameters, commandType: CommandType.StoredProcedure);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ExceptionHandler.HandleException(ex);
-            }
-        }
-
-        public async Task<List<PersonDTO>> DeletePersonAsync(int personId)
-        {
-            var parameters = new { PersonId = personId };
-
-            try
-            {
-                using (var dbConnection = DBConnection())
-                {
-                    await dbConnection.OpenAsync();
-
-                    await ExecuteStoredProcedureAsync("[UVA].[SP_DELETE_PERSON]", parameters);
-
-                    var clients = await dbConnection.QueryAsync<PersonDTO>("[UVA].[SP_GET_PEOPLE]", commandType: CommandType.StoredProcedure);
-                    return clients.ToList() ?? new List<PersonDTO>();
                 }
             }
             catch (Exception ex)

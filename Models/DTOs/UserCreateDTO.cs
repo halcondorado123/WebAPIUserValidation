@@ -20,7 +20,7 @@ namespace ApiUserValidation.Models.DTOs
         public int StatusId { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }  // Aquí se recibe la contraseña en texto plano]
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
         public DateTime? LastLogin { get; set; }
 

@@ -9,8 +9,14 @@ namespace ApiUserValidation.Data.Exceptions
             switch (ex)
             {
                 case SqlException sqlEx:
-                    Console.WriteLine($"SQL Error: {sqlEx.Message}");
-                    return new Exception("An error occurred while accessing the database. Please try again later.");
+
+                    if (sqlEx.Message.Contains("No changes detected"))
+                    {
+                        return new Exception(sqlEx.Message);
+                    }
+
+                    // 🔥 Si es otro error, agregamos el prefijo estándar
+                    return new Exception($"An error occurred while accessing the database. {sqlEx.Message}");
 
                 case TimeoutException timeoutEx:
                     Console.WriteLine($"Timeout Error: {timeoutEx.Message}");

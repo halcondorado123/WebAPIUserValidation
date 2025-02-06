@@ -6,6 +6,8 @@ using ApiUserValidation.Models.DTOs;
 using ApiUserValidation.Models.Entities;
 using AutoMapper;
 using Dapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
@@ -132,6 +134,74 @@ namespace DataAccess.DataAccessUsers
             }
         }
 
+        public async Task<List<int>> BulkInsertUsersAsync(List<UserCreateDTO> users)
+        {
+            var createdIds = new List<int>();
+
+            try
+            {
+                await using var dbConnection = DBConnection();
+                await dbConnection.OpenAsync();
+
+                //  Filtrar datos duplicados por IdentificationNumber y Email antes de insertar
+                var uniqueUsers = users
+                    .GroupBy(p => new { p.IdentificationNumber, p.Email }) // Agrupar por identificación y correo
+                    .Select(g => g.First()) // Tomar solo el primer registro por grupo
+                    .ToList();
+
+                foreach (var userDto in uniqueUsers)
+                {
+                    //  Crear una instancia de UserME y generar el hash con SetPassword()
+                    var userEntity = new UserME
+                    {
+                        UserName = userDto.UserName,
+                        RolId = userDto.RolId,
+                        StatusId = userDto.StatusId,
+                        CreatedAt = userDto.CreatedAt,
+                        UpdatedAt = userDto.UpdatedAt,
+                        LastLogin = userDto.LastLogin
+                    };
+                    userEntity.SetPassword(userDto.Password); // ✅ Generar hash aquí
+
+                    var parameters = new
+                    {
+                        userDto.IdentificationId,
+                        userDto.IdentificationNumber,
+                        userDto.ClientName,
+                        userDto.ClientLastName,
+                        userDto.GenderId,
+                        userDto.Age,
+                        userDto.Birthday,
+                        userDto.Email,
+                        userDto.Phone,
+                        userDto.RolId,
+                        userDto.StatusId,
+                        userDto.UserName,
+                        UserPasswordHash = userEntity.UserPasswordHash, // ✅ Hash ya generado
+                        userDto.CreatedAt,
+                        userDto.UpdatedAt,
+                        userDto.LastLogin
+                    };
+
+                    int newPersonId = await dbConnection.QuerySingleAsync<int>(
+                        "[UVA].[SP_INSERT_USER]",
+                        parameters,
+                        commandType: CommandType.StoredProcedure
+                    );
+
+                    createdIds.Add(newPersonId);
+                }
+
+                return createdIds; // Retorna la lista de IDs creados
+            }
+            catch (Exception ex)
+            {
+                throw ExceptionHandler.HandleException(ex);
+            }
+        }
+
+
+
         public async Task<UserResponseDTO> AddUserToExistingPersonAsync(UserCreateDTO userDto)
         {
             try
@@ -215,6 +285,27 @@ namespace DataAccess.DataAccessUsers
             }
         }
 
+        public async Task<int> DeleteUserAsync(int personId)
+        {
+            var parameters = new { PersonId = personId };
+
+            try
+            {
+                using (var dbConnection = DBConnection())
+                {
+                    await dbConnection.OpenAsync();
+
+                    // Ejecutar el SP y obtener las filas afectadas
+                    int affectedRows = await dbConnection.ExecuteScalarAsync<int>("[UVA].[SP_DELETE_USER]", parameters, commandType: CommandType.StoredProcedure);
+
+                    return affectedRows; // Retorna el número de filas eliminadas
+                }
+            }
+            catch (Exception ex)
+            {
+                throw ExceptionHandler.HandleException(ex);
+            }
+        }
 
         private UserME MapPersonDTOToEntity(UserCreateDTO userDto)
         {
@@ -233,6 +324,7 @@ namespace DataAccess.DataAccessUsers
                 RolId = userDto.RolId,
                 StatusId = userDto.StatusId,
                 UserName = userDto.UserName,
+                CreatedAt = userDto.CreatedAt,
                 UpdatedAt = DateTime.UtcNow,  // Actualizamos la fecha de modificación
                 LastLogin = userDto.LastLogin,
             };

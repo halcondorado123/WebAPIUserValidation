@@ -35,7 +35,7 @@ namespace ApiUserValidation.Models.Entities
         public StatusME Status { get; set; }
 
         [Column("CreatedAt")]
-        public DateTime CreatedAt { get; set; } 
+        public DateTime? CreatedAt { get; set; } 
 
         [Column("UpdatedAt")]
         public DateTime? UpdatedAt { get; set; }

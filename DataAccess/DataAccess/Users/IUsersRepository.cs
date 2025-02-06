@@ -13,8 +13,10 @@ namespace ApiUserValidation.Data.DataAccess.Users
         Task<IEnumerable<UserResponseDTO>> GetUsersAsync();
         Task<UserResponseDTO> GetUserByIdAsync(int personId);
         Task<int> CreateUserAsync(UserCreateDTO userDto);
+        Task<List<int>> BulkInsertUsersAsync(List<UserCreateDTO> users);
         Task<UserResponseDTO> AddUserToExistingPersonAsync(UserCreateDTO userDto);
         Task<int> UpdateUserAsync(UserCreateDTO userDto);
+        Task<int> DeleteUserAsync(int personId);
 
         //UserME ValidateUser(UserME usuario);
         //bool UpdateUser(UserME user);

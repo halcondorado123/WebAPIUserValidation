@@ -7,7 +7,8 @@ namespace ApiUserValidation.Data.DataAccess.Persons
         Task<List<PersonDTO>> GetPeopleAsync();
         Task<PersonDTO> GetPersonByIdAsync(int personId);
         Task<int> CreatePersonAsync(PersonDTO personDto);
+        Task<List<int>> BulkInsertPeopleAsync(List<PersonDTO> people);
         Task UpdatePersonAsync(PersonDTO personDto);
-        Task<List<PersonDTO>> DeletePersonAsync(int personId);
+        Task<int> DeletePersonAsync(int personId);
     }
 }

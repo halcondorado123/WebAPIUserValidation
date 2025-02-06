@@ -1,11 +1,13 @@
 ﻿using ApiUserValidation.Data.DataAccess.Users;
 using ApiUserValidation.Models.DTOs;
 using ApiUserValidation.Models.Entities;
+using APIUserValidation.Helpers;
 using DataAccess.DataAccessUsers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using Swashbuckle.AspNetCore.Annotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -76,7 +78,26 @@ namespace APIUserValidation.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
+                return StatusCode(500, $"Internal server error:\n\n {ex.Message}");
+            }
+        }
+
+
+        [AllowAnonymous]
+        [HttpPost("BulkInsertUsers")]
+        [SwaggerOperation(
+         Summary = SwaggerComments.Clients.CreateUserSummary,
+         Description = SwaggerComments.Clients.CreateUserDescription)]
+        public async Task<IActionResult> BulkInsertUsers([FromBody] List<UserCreateDTO> users)
+        {
+            try
+            {
+                var createdIds = await _IUsersRepository.BulkInsertUsersAsync(users);
+                return Ok(new { message = $"Successfully inserted {users.Count} people.", ids = createdIds });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -124,21 +145,24 @@ namespace APIUserValidation.Controllers
             }
         }
 
-        //[HttpDelete("{id}")]
-        //[Authorize]
-        //[AllowAnonymous]
-        //public ActionResult DeleteUser(int id)
-        //{
-        //    try
-        //    {
-        //        var result = _IUsersRepository.DeleteUser(id);
-        //        return Ok(result);
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        return BadRequest(new { message = ex.Message });
-        //    }
-        //}
+        [AllowAnonymous]
+        [HttpDelete("DeletePerson")]
+        [SwaggerOperation(
+        Summary = SwaggerComments.Clients.UpdateUserSummary,
+        Description = SwaggerComments.Clients.UpdateUserDescription)]
+        public async Task<IActionResult> DeletePerson(int personId)
+        {
+            try
+            {
+                await _IUsersRepository.DeleteUserAsync(personId);
+
+                return Ok(new { message = "The client has been successfully deleted." });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
     }
 }
 

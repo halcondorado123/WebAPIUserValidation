@@ -78,6 +78,27 @@ namespace APIUserValidation.Controllers
             }
         }
 
+
+        [AllowAnonymous]
+        [HttpPost("BulkInsertPeople")]
+        [SwaggerOperation(
+         Summary = SwaggerComments.Clients.CreateUserSummary,
+         Description = SwaggerComments.Clients.CreateUserDescription)]
+        public async Task<IActionResult> BulkInsertPeople([FromBody] List<PersonDTO> people)
+        {
+            try
+            {
+                var createdIds = await _personRepository.BulkInsertPeopleAsync(people);
+                return Ok(new { message = $"Successfully inserted {createdIds.Count} people.", ids = createdIds });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+
+
         [AllowAnonymous]
         [HttpPut("UpdatePerson")]
         [SwaggerOperation(
