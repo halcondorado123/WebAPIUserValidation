@@ -54,7 +54,7 @@ public static class DatabaseInitializer
         if (!context.Identification.Any())
         {
             context.Identification.AddRange(
-                new IdentificationME { IdentificationType = "Cedula de ciudadania" },
+                new IdentificationME { IdentificationType = "Cédula de ciudadania" },
                 new IdentificationME { IdentificationType = "Tarjeta de identidad" },
                 new IdentificationME { IdentificationType = "Cédula de extranjeria" },
                 new IdentificationME { IdentificationType = "Pasaporte" },

@@ -23,9 +23,9 @@ namespace APIUserValidation.Controllers
 
         [AllowAnonymous]
         [HttpGet("GetClients")]
-        [SwaggerOperation(
-            Summary = SwaggerComments.Clients.GetAllUsersSummary,
-            Description = SwaggerComments.Clients.GetAllUsersDescription)]
+        //[SwaggerOperation(
+        //    Summary = SwaggerCommentsENG.Clients.GetAllUsersSummary,
+        //    Description = SwaggerCommentsENG.Clients.GetAllUsersDescription)]
         public async Task<IActionResult> GetClients()
         {
             try
@@ -41,9 +41,9 @@ namespace APIUserValidation.Controllers
 
         [AllowAnonymous]
         [HttpGet("GetClientByID{personId}")]
-        [SwaggerOperation(
-        Summary = SwaggerComments.Clients.GetUserByIdSummary,
-        Description = SwaggerComments.Clients.GetUserByIdDescription)]
+        //[SwaggerOperation(
+        //Summary = SwaggerCommentsENG.Clients.GetUserByIdSummary,
+        //Description = SwaggerCommentsENG.Clients.GetUserByIdDescription)]
         public async Task<IActionResult> GetClientById(int personId)
         {
             try
@@ -65,8 +65,8 @@ namespace APIUserValidation.Controllers
         [AllowAnonymous]
         [HttpPost("CreatePerson")]
         [SwaggerOperation(
-         Summary = SwaggerComments.Clients.CreateUserSummary,
-         Description = SwaggerComments.Clients.CreateUserDescription)]
+         Summary = SwaggerCommentsENG.Clients.CreateUserSummary,
+         Description = SwaggerCommentsENG.Clients.CreateUserDescription)]
         public async Task<IActionResult> CreatePerson([FromBody] PersonDTO person)
         {
             try
@@ -85,8 +85,8 @@ namespace APIUserValidation.Controllers
         [AllowAnonymous]
         [HttpPost("BulkInsertPeople")]
         [SwaggerOperation(
-         Summary = SwaggerComments.Clients.CreateUserSummary,
-         Description = SwaggerComments.Clients.CreateUserDescription)]
+         Summary = SwaggerCommentsENG.Clients.CreateUserSummary,
+         Description = SwaggerCommentsENG.Clients.CreateUserDescription)]
         public async Task<IActionResult> BulkInsertPeople([FromBody] List<PersonDTO> people)
         {
             try
@@ -107,8 +107,8 @@ namespace APIUserValidation.Controllers
         [AllowAnonymous]
         [HttpPut("UpdatePerson")]
         [SwaggerOperation(
-        Summary = SwaggerComments.Clients.UpdateUserSummary,
-        Description = SwaggerComments.Clients.UpdateUserDescription)]
+        Summary = SwaggerCommentsENG.Clients.UpdateUserSummary,
+        Description = SwaggerCommentsENG.Clients.UpdateUserDescription)]
         public async Task<IActionResult> UpdatePerson([FromBody]PersonDTO person)
         {
             try
@@ -126,8 +126,8 @@ namespace APIUserValidation.Controllers
         [AllowAnonymous]
         [HttpDelete("DeletePerson")]
         [SwaggerOperation(
-        Summary = SwaggerComments.Clients.UpdateUserSummary,
-        Description = SwaggerComments.Clients.UpdateUserDescription)]
+        Summary = SwaggerCommentsENG.Clients.DeleteUserSummary,
+        Description = SwaggerCommentsENG.Clients.UpdateUserDescription)]
         public async Task<IActionResult> DeletePerson(int personId)
         {
             try

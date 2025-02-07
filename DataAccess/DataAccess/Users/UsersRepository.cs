@@ -1,10 +1,8 @@
 ﻿using ApiUserValidation.Data.Configuration;
-using ApiUserValidation.Data.Context;
 using ApiUserValidation.Data.DataAccess.Users;
 using ApiUserValidation.Data.Exceptions;
 using ApiUserValidation.Models.DTOs;
 using ApiUserValidation.Models.Entities;
-using AutoMapper;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Data;
@@ -25,8 +23,6 @@ namespace DataAccess.DataAccessUsers
         {
             return new SqlConnection(_connectionString.ConnectionString);
         }
-
-
         public async Task<IEnumerable<UserResponseDTO>> GetUsersAsync(int page = 1, int pageSize = 10)
         {
             try
@@ -54,8 +50,6 @@ namespace DataAccess.DataAccessUsers
                 throw ExceptionHandler.HandleException(ex);
             }
         }
-
-
 
         public async Task<UserResponseDTO> GetUserByIdAsync(int personId)
         {
@@ -85,6 +79,42 @@ namespace DataAccess.DataAccessUsers
                 throw ExceptionHandler.HandleException(ex);
             }
         }
+
+        public async Task<UserResponseDTO> GetUserByParametersAsync(int? userTypeId, string? userId, string? email)
+        {
+            try
+            {
+                var parameters = new
+                {
+                    IdentificationId = userTypeId,
+                    IdentificationNumber = userId,
+                    Email = email
+                };
+
+                await using var dbConnection = DBConnection();
+                await dbConnection.OpenAsync();
+
+                string storedProcedure = "[UVA].[SP_GET_USER_BY_PARAMETERS]";
+
+                var person = await dbConnection.QueryFirstOrDefaultAsync<UserResponseDTO>(
+                    storedProcedure,
+                    parameters,
+                    commandType: CommandType.StoredProcedure
+                );
+
+                if (person == null)
+                {
+                    throw ExceptionHandler.NullHandleException("The customer was not found in the database.");
+                }
+
+                return person;
+            }
+            catch (Exception ex)
+            {
+                throw ExceptionHandler.HandleException(ex);
+            }
+        }
+
 
         public async Task<int> CreateUserAsync(UserCreateDTO userDto)
         {
@@ -130,7 +160,6 @@ namespace DataAccess.DataAccessUsers
                 throw ExceptionHandler.HandleException(ex);
             }
         }
-
         public async Task<List<int>> BulkInsertUsersAsync(List<UserCreateDTO> users)
         {
             var createdIds = new List<int>();
@@ -301,9 +330,9 @@ namespace DataAccess.DataAccessUsers
 
 
 
-        public async Task<int> DeleteUserAsync(int personId)
+        public async Task<int> DeleteUserAsync(int typeId, int personId)
         {
-            var parameters = new { PersonId = personId };
+            var parameters = new { IdentificationId = typeId, IdentificationNumber = personId };
 
             try
             {
