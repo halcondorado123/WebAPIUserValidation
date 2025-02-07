@@ -16,7 +16,7 @@ namespace ApiUserValidation.Data.DataAccess.Users
         Task<int> CreateUserAsync(UserCreateDTO userDto);
         Task<List<int>> BulkInsertUsersAsync(List<UserCreateDTO> users);
         Task<UserResponseDTO> AddUserToExistingPersonAsync(UserCreateDTO userDto);
-        Task<int> UpdateUserAsync(UserCreateDTO userDto);
+        Task<UserResponseDTO?> UpdateUserAsync(UserCreateDTO person);
         Task<int> DeleteUserAsync(int personId);
         Task<UserAuthDTO?> ValidateUserAsync(string userName, string password);
     }

@@ -131,21 +131,30 @@ namespace APIUserValidation.Controllers
         {
             try
             {
-                int affectedRows = await _IUsersRepository.UpdateUserAsync(userDto);
-                if (affectedRows > 0)
+                // Llamamos al repositorio para actualizar y obtener el usuario actualizado
+                var updatedUser = await _IUsersRepository.UpdateUserAsync(userDto);
+
+                if (updatedUser == null)
                 {
-                    return Ok(new { message = "Usuario actualizado correctamente." });
+                    return NotFound(new { message = "No se encontró el usuario o no hubo cambios en los datos." });
                 }
-                else
+
+                return Ok(new
                 {
-                    return NotFound(new { message = "No se encontraron registros para actualizar." });
-                }
+                    message = "Usuario actualizado correctamente.",
+                    user = updatedUser 
+                });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "Ocurrió un error al actualizar el usuario.", error = ex.Message });
+                return StatusCode(500, new
+                {
+                    message = "Ocurrió un error al actualizar el usuario.",
+                    error = ex.Message
+                });
             }
         }
+
 
         [AllowAnonymous]
         [HttpDelete("DeletePerson")]

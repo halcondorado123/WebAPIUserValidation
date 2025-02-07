@@ -237,11 +237,28 @@ namespace DataAccess.DataAccessUsers
                 throw ExceptionHandler.HandleException(ex);
             }
         }
-
-        public async Task<int> UpdateUserAsync(UserCreateDTO userDto)
+        public async Task<UserResponseDTO?> UpdateUserAsync(UserCreateDTO userDto)
         {
             try
             {
+                int personId = userDto.PersonId;
+
+                // 🔥 1️⃣ Obtener el usuario actual antes de modificar
+                var existingUser = await GetUserByIdAsync(personId);
+                if (existingUser == null)
+                {
+                    throw new Exception("User not found.");
+                }
+
+                // 🔥 2️⃣ Ignorar valores `"string"` o `null`, usando los valores actuales
+                userDto.IdentificationNumber = IsInvalid(userDto.IdentificationNumber) ? existingUser.IdentificationNumber : userDto.IdentificationNumber;
+                userDto.ClientName = IsInvalid(userDto.ClientName) ? existingUser.ClientName : userDto.ClientName;
+                userDto.ClientLastName = IsInvalid(userDto.ClientLastName) ? existingUser.ClientLastName : userDto.ClientLastName;
+                userDto.Email = IsInvalid(userDto.Email) ? existingUser.Email : userDto.Email;
+                userDto.Phone = IsInvalid(userDto.Phone) ? existingUser.Phone : userDto.Phone;
+                userDto.RolId = existingUser.RolId; // 🔥 Se mantiene sin cambio
+
+                // 🔥 3️⃣ Mapear `UserCreateDTO` a `UserME`
                 var user = MapPersonDTOToEntity(userDto);
                 user.UpdatedAt = DateTime.UtcNow;
 
@@ -268,20 +285,24 @@ namespace DataAccess.DataAccessUsers
                 await using var dbConnection = DBConnection();
                 await dbConnection.OpenAsync();
 
-                // Ejecutar el procedimiento almacenado para actualizar el usuario
-                int affectedRows = await dbConnection.ExecuteAsync(
+                // 🔥 4️⃣ Ejecutar el SP y obtener el usuario actualizado
+                var updatedUser = await dbConnection.QueryFirstOrDefaultAsync<UserResponseDTO>(
                     "[UVA].[SP_UPDATE_USER]",
                     parameters,
                     commandType: CommandType.StoredProcedure
                 );
 
-                return affectedRows;
+                return updatedUser;
             }
             catch (Exception ex)
             {
                 throw ExceptionHandler.HandleException(ex);
             }
         }
+
+
+
+
 
         public async Task<int> DeleteUserAsync(int personId)
         {
@@ -390,6 +411,11 @@ namespace DataAccess.DataAccessUsers
             }
 
             return age;
+        }
+
+        private bool IsInvalid(string? value)
+        {
+            return string.IsNullOrWhiteSpace(value) || value.Equals("string", StringComparison.OrdinalIgnoreCase);
         }
     }
 }
