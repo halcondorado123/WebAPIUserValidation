@@ -1,7 +1,6 @@
 ﻿using ApiUserValidation.Data.Configuration;
 using ApiUserValidation.Data.DataAccess.Persons;
 using ApiUserValidation.Models.DTOs;
-using ApiUserValidation.Models.Entities;
 using APIUserValidation.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

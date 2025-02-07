@@ -9,7 +9,7 @@ public static class SwaggerConfig
         services.AddSwaggerGen(c =>
         {
             c.SwaggerDoc("v1", new OpenApiInfo { Title = "UserValidation V1", Version = "Versio1.0" });
-
+            c.EnableAnnotations();
             // Configuración de JWT en Swagger
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {

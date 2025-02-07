@@ -1,17 +1,11 @@
 ﻿using ApiUserValidation.Data.DataAccess.Users;
+using ApiUserValidation.Data.Exceptions;
 using ApiUserValidation.Models.DTOs;
 using ApiUserValidation.Models.Entities;
 using APIUserValidation.Helpers;
-using DataAccess.DataAccessUsers;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-using Newtonsoft.Json;
 using Swashbuckle.AspNetCore.Annotations;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
 using LoginRequest = ApiUserValidation.Models.Entities.LoginRequest;
 
 namespace APIUserValidation.Controllers
@@ -32,58 +26,66 @@ namespace APIUserValidation.Controllers
         [HttpGet]
         [Authorize]
         [AllowAnonymous]
-        public async Task<IActionResult> GetUsers()
+        [SwaggerOperation(
+            Summary = SwaggerComments.Clients.GetAllUsersSummary,
+            Description = SwaggerComments.Clients.GetAllUsersDescription)]
+        public async Task<IActionResult> GetUsers(int page = 1, int pageSize = 10)
         {
-            var user = await _IUsersRepository.GetUsersAsync(); // Debes tener este método en tu repositorio
-
-            if (user == null)
+            try
             {
-                return NotFound();
-            }
+                var users = await _IUsersRepository.GetUsersAsync(page, pageSize);
+                if (users == null || !users.Any()) return NotFound(new { message = "No users found in the database." });
 
-            return Ok(user);
+                return Ok(new { message = "Success", data = users });
+            }
+            catch (Exception ex)
+            {
+                throw ExceptionHandler.HandleException(ex);
+                //return StatusCode(500, $"Internal server error:\n\n {ex.Message}");
+                //return BadRequest(new { message = ex.Message });
+            }
         }
 
         [HttpGet("{id}")]
         [Authorize]
         [AllowAnonymous]
+        [SwaggerOperation(
+            Summary = SwaggerComments.Clients.GetAllUsersSummary,
+            Description = SwaggerComments.Clients.GetAllUsersDescription)]
         public async Task<IActionResult> GetUserById(int id)
         {
-            var user = await _IUsersRepository.GetUserByIdAsync(id); // Debes tener este método en tu repositorio
-
-            if (user == null)
+            try
             {
-                return NotFound();
+                var user = await _IUsersRepository.GetUserByIdAsync(id);
+                if (user == null) return NotFound(new { message = "No user found with the specified PersonId." });
+
+                return Ok(new { message = "Success", data = user });
             }
-
-            return Ok(user);
+            catch (Exception ex)
+            {
+                throw ExceptionHandler.HandleException(ex);
+            }
         }
-
 
         [HttpPost]
         [Authorize]
         [AllowAnonymous]
+        [SwaggerOperation(
+            Summary = SwaggerComments.Clients.GetAllUsersSummary,
+            Description = SwaggerComments.Clients.GetAllUsersDescription)]
         public async Task<IActionResult> CreateUser([FromBody] UserCreateDTO userDto)
         {
-            if (userDto == null)
-            {
-                return BadRequest("User data is null");
-            }
-
             try
             {
-                // Llamas al método CreateUserAsync del repositorio
                 var createdUser = await _IUsersRepository.CreateUserAsync(userDto);
-
-                // Devuelves una respuesta con el usuario creado
-                return CreatedAtAction(nameof(GetUserById), new { id = createdUser }, createdUser);
+                return CreatedAtAction(nameof(GetUserById),
+                    new { id = createdUser }, createdUser);
             }
             catch (Exception ex)
             {
-                return StatusCode(500, $"Internal server error:\n\n {ex.Message}");
+                throw ExceptionHandler.HandleException(ex);
             }
         }
-
 
         [AllowAnonymous]
         [HttpPost("BulkInsertUsers")]
@@ -95,69 +97,60 @@ namespace APIUserValidation.Controllers
             try
             {
                 var createdIds = await _IUsersRepository.BulkInsertUsersAsync(users);
-                return Ok(new { message = $"Successfully inserted {users.Count} people.", ids = createdIds });
+                var idsString = $"[{string.Join(", ", createdIds)}]";
+                return Ok(new { message = $"Successfully inserted {users.Count} users.", ids = createdIds });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                throw ExceptionHandler.HandleException(ex);
             }
         }
 
         [HttpPut("Insert_user_to_existing_person")]
         [Authorize]
         [AllowAnonymous]
+        [SwaggerOperation(
+            Summary = SwaggerComments.Clients.GetAllUsersSummary,
+            Description = SwaggerComments.Clients.GetAllUsersDescription)]
         public async Task<IActionResult> InsertUserToExistingPerson([FromBody] UserCreateDTO userDto)
         {
-            if (userDto == null)
+            try
             {
-                return BadRequest("Datos de usuario inválidos.");
+                var user = await _IUsersRepository.AddUserToExistingPersonAsync(userDto);
+                if (user == null) return NotFound($"No user found with the specified PersonId.");
+
+                return CreatedAtAction(nameof(GetUserById), new { id = user.PersonId }, user);
             }
-
-            var user = await _IUsersRepository.AddUserToExistingPersonAsync(userDto);
-
-            if (user == null)
+            catch (Exception ex)
             {
-                return NotFound($"No se encontró la persona con ID");
+                throw ExceptionHandler.HandleException(ex);
             }
-
-            return CreatedAtAction(nameof(GetUserById), new { id = user.PersonId }, user);
         }
-
 
         [HttpPut("Update_user")]
         [Authorize]
         [AllowAnonymous]
+        [SwaggerOperation(
+            Summary = SwaggerComments.Clients.GetAllUsersSummary,
+            Description = SwaggerComments.Clients.GetAllUsersDescription)]
         public async Task<IActionResult> UpdateUser([FromBody] UserCreateDTO userDto)
         {
             try
             {
-                // Llamamos al repositorio para actualizar y obtener el usuario actualizado
                 var updatedUser = await _IUsersRepository.UpdateUserAsync(userDto);
+                if (updatedUser == null) return NotFound(new { message = "The user was not found or there were no changes to the data." });
 
-                if (updatedUser == null)
-                {
-                    return NotFound(new { message = "No se encontró el usuario o no hubo cambios en los datos." });
-                }
-
-                return Ok(new
-                {
-                    message = "Usuario actualizado correctamente.",
-                    user = updatedUser 
-                });
+                return Ok(new { message = "User succesfully uploaded.", user = updatedUser });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new
-                {
-                    message = "Ocurrió un error al actualizar el usuario.",
-                    error = ex.Message
-                });
+                throw ExceptionHandler.HandleException(ex);
             }
         }
 
-
-        [AllowAnonymous]
         [HttpDelete("DeletePerson")]
+        [Authorize]
+        [AllowAnonymous]
         [SwaggerOperation(
         Summary = SwaggerComments.Clients.UpdateUserSummary,
         Description = SwaggerComments.Clients.UpdateUserDescription)]
@@ -166,29 +159,28 @@ namespace APIUserValidation.Controllers
             try
             {
                 await _IUsersRepository.DeleteUserAsync(personId);
-
-                return Ok(new { message = "The client has been successfully deleted." });
+                return Ok(new { message = "The user has been successfully deleted." });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                throw ExceptionHandler.HandleException(ex);
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("Validate_User")]
+        [Authorize]
+        [AllowAnonymous]
         [SwaggerOperation(
         Summary = SwaggerComments.Clients.UpdateUserSummary,
         Description = SwaggerComments.Clients.UpdateUserDescription)]
         public async Task<IActionResult> ValidateUser([FromBody] LoginRequest request)
         {
-            if (string.IsNullOrWhiteSpace(request.UserName) || string.IsNullOrWhiteSpace(request.Password))
-                return BadRequest(new { message = "Username and password are required." });
-
             try
             {
                 var user = await _IUsersRepository.ValidateUserAsync(request.UserName, request.Password);
 
+                if (string.IsNullOrWhiteSpace(request.UserName) || string.IsNullOrWhiteSpace(request.Password))
+                    return BadRequest(new { message = "Username and password are required." });
                 if (user == null)
                     return Unauthorized(new { message = "Invalid username or password." });
 
@@ -196,7 +188,7 @@ namespace APIUserValidation.Controllers
             }
             catch (Exception ex)
             {
-                return StatusCode(500, new { message = "An internal error occurred.", details = ex.Message });
+                throw ExceptionHandler.HandleException(ex);
             }
         }
     }

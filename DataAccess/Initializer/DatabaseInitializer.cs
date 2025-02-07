@@ -1,33 +1,37 @@
-﻿using ApiUserValidation.Data.Context;
-using ApiUserValidation.Models.Entities;
+﻿using ApiUserValidation.Data.Exceptions;
 using ApiUserValidation.Models.Entities.UserAttributesME;
-using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 
 public static class DatabaseInitializer
 {
     public static async Task SeedDataAsync(IServiceProvider serviceProvider)
     {
-        using var scope = serviceProvider.CreateScope();
-        var context = scope.ServiceProvider.GetRequiredService<ApiUserValidation.Data.Context.WebAppDbContext>();
-
-        var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
-
-        // Solo ejecutamos la migración si hay más de 1 migración pendiente
-        if (pendingMigrations.Count() > 1)
+        try
         {
-            await context.Database.MigrateAsync();
+            using var scope = serviceProvider.CreateScope();
+            var context = scope.ServiceProvider.GetRequiredService<ApiUserValidation.Data.Context.WebAppDbContext>();
+
+            var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
+
+            // Solo ejecutamos la migración si hay más de 1 migración pendiente
+            if (pendingMigrations.Count() > 1)
+            {
+                await context.Database.MigrateAsync();
+            }
+
+            // Seed otros datos (Género, Identificación, Estado Civil)
+            await SeedGendersAsync(context);
+            await SeedIdentificationTypesAsync(context);
+            await SeedRolesAsync(context);
+            await SendStatusTypeAsync(context);
         }
 
-        // Seed otros datos (Género, Identificación, Estado Civil)
-        await SeedGendersAsync(context);
-        await SeedIdentificationTypesAsync(context);
-        await SeedRolesAsync(context);
-        await SendStatusTypeAsync(context);
+        catch (Exception ex)
+        {
+            throw ExceptionHandler.HandleException(ex);
+        }
     }
 
     // 3️⃣ Seed de Géneros

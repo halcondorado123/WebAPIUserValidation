@@ -6,10 +6,7 @@ using ApiUserValidation.Models.DTOs;
 using ApiUserValidation.Models.Entities;
 using AutoMapper;
 using Dapper;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
-using Microsoft.EntityFrameworkCore;
 using System.Data;
 
 namespace DataAccess.DataAccessUsers
@@ -17,13 +14,11 @@ namespace DataAccess.DataAccessUsers
     public class UsersRepository : IUsersRepository
     {
         private ConfigurationData _connectionString;
-        private readonly WebAppDbContext _context;
-        private readonly IMapper _mapper;
-        public UsersRepository(ConfigurationData connectionString, WebAppDbContext context, IMapper mapper)
+        //private readonly WebAppDbContext _context;
+        //private readonly IMapper _mapper;
+        public UsersRepository(ConfigurationData connectionString)
         {
             _connectionString = connectionString;
-            _context = context;
-            _mapper = mapper;
         }
 
         protected SqlConnection DBConnection()
@@ -32,23 +27,24 @@ namespace DataAccess.DataAccessUsers
         }
 
 
-        public async Task<IEnumerable<UserResponseDTO>> GetUsersAsync()
+        public async Task<IEnumerable<UserResponseDTO>> GetUsersAsync(int page = 1, int pageSize = 10)
         {
             try
             {
-                await using var dbConnection = DBConnection();
-                await dbConnection.OpenAsync();
+                using var dbConnection = await GetOpenDbConnectionAsync();
+                int offset = (page - 1) * pageSize; // Calculamos el desplazamiento
 
                 string storedProcedure = "[UVA].[SP_GET_USERS]";
 
-                var persons = await dbConnection.QueryAsync<UserResponseDTO>(
+                var persons = (await dbConnection.QueryAsync<UserResponseDTO>(
                     storedProcedure,
+                    new { Offset = offset, PageSize = pageSize }, // Enviamos los parámetros a la SP
                     commandType: CommandType.StoredProcedure
-                );
+                )).ToList();
 
-                if (persons == null)
+                if (!persons.Any())
                 {
-                    throw new Exception("Client not found.");
+                    throw ExceptionHandler.NullHandleException("Customers have not been found in the database.");
                 }
 
                 return persons;
@@ -58,6 +54,7 @@ namespace DataAccess.DataAccessUsers
                 throw ExceptionHandler.HandleException(ex);
             }
         }
+
 
 
         public async Task<UserResponseDTO> GetUserByIdAsync(int personId)
@@ -78,7 +75,7 @@ namespace DataAccess.DataAccessUsers
 
                 if (person == null)
                 {
-                    throw new Exception("Client not found.");
+                    throw ExceptionHandler.NullHandleException("The Customer have not been found in the database.");
                 }
 
                 return person;
@@ -256,9 +253,9 @@ namespace DataAccess.DataAccessUsers
                 userDto.ClientLastName = IsInvalid(userDto.ClientLastName) ? existingUser.ClientLastName : userDto.ClientLastName;
                 userDto.Email = IsInvalid(userDto.Email) ? existingUser.Email : userDto.Email;
                 userDto.Phone = IsInvalid(userDto.Phone) ? existingUser.Phone : userDto.Phone;
-                userDto.RolId = existingUser.RolId; // 🔥 Se mantiene sin cambio
+                userDto.RolId = existingUser.RolId;
 
-                // 🔥 3️⃣ Mapear `UserCreateDTO` a `UserME`
+                // 'UserCreateDTO' a 'UserME'
                 var user = MapPersonDTOToEntity(userDto);
                 user.UpdatedAt = DateTime.UtcNow;
 
@@ -277,7 +274,7 @@ namespace DataAccess.DataAccessUsers
                     user.UserName,
                     user.RolId,
                     user.StatusId,
-                    UserPasswordHash = user.UserPasswordHash, // Solo si la contraseña se ha cambiado
+                    UserPasswordHash = user.UserPasswordHash,
                     user.UpdatedAt,
                     user.LastLogin
                 };
@@ -413,6 +410,30 @@ namespace DataAccess.DataAccessUsers
             return age;
         }
 
+
+        private async Task<IDbConnection> GetOpenDbConnectionAsync()
+        {
+            var dbConnection = DBConnection(); // Método que obtiene la conexión
+
+            try
+            {
+                await dbConnection.OpenAsync();
+                return dbConnection;
+            }
+            catch (SqlException sqlEx)
+            {
+                throw ExceptionHandler.HandleException(sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw ExceptionHandler.HandleException(ex);
+            }
+
+        }
+
+
+
+        // Para validar cuando se ingrese caracteres vacios o "string"
         private bool IsInvalid(string? value)
         {
             return string.IsNullOrWhiteSpace(value) || value.Equals("string", StringComparison.OrdinalIgnoreCase);

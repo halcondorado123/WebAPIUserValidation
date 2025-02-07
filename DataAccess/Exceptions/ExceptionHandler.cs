@@ -19,7 +19,7 @@ namespace ApiUserValidation.Data.Exceptions
                         return new Exception ($"Invalid username or password.");
                     }
                     // 🔥 Si es otro error, agregamos el prefijo estándar
-                    return new Exception($"An error occurred while accessing the database. {sqlEx.Message}");
+                    return new Exception($"An error occurred while accessing the database. \n\n**** SQL-EXCEPTION: {sqlEx.Message} ****\n");
 
                 case TimeoutException timeoutEx:
                     Console.WriteLine($"Timeout Error: {timeoutEx.Message}");
@@ -34,5 +34,11 @@ namespace ApiUserValidation.Data.Exceptions
                     return new Exception(ex.Message);
             }
         }
+
+    public static Exception NullHandleException(string customMessage, Exception ex = null)
+    {
+        string message = ex == null ? customMessage : $"{customMessage} {ex.Message}";
+        return new Exception(message);
+    }
     }
 }
