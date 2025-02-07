@@ -14,7 +14,10 @@ namespace ApiUserValidation.Data.Exceptions
                     {
                         return new Exception(sqlEx.Message);
                     }
-
+                    if (ex.Message.Contains("Invalid username or password"))
+                    {
+                        return new Exception ($"Invalid username or password.");
+                    }
                     // 🔥 Si es otro error, agregamos el prefijo estándar
                     return new Exception($"An error occurred while accessing the database. {sqlEx.Message}");
 

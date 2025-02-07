@@ -4,6 +4,7 @@ using ApiUserValidation.Models.Entities;
 using APIUserValidation.Helpers;
 using DataAccess.DataAccessUsers;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
@@ -11,6 +12,7 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using LoginRequest = ApiUserValidation.Models.Entities.LoginRequest;
 
 namespace APIUserValidation.Controllers
 {
@@ -28,7 +30,7 @@ namespace APIUserValidation.Controllers
         }
 
         [HttpGet]
-        //[Authorize]
+        [Authorize]
         [AllowAnonymous]
         public async Task<IActionResult> GetUsers()
         {
@@ -43,7 +45,7 @@ namespace APIUserValidation.Controllers
         }
 
         [HttpGet("{id}")]
-        //[Authorize]
+        [Authorize]
         [AllowAnonymous]
         public async Task<IActionResult> GetUserById(int id)
         {
@@ -161,6 +163,31 @@ namespace APIUserValidation.Controllers
             catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [AllowAnonymous]
+        [HttpPost("Validate_User")]
+        [SwaggerOperation(
+        Summary = SwaggerComments.Clients.UpdateUserSummary,
+        Description = SwaggerComments.Clients.UpdateUserDescription)]
+        public async Task<IActionResult> ValidateUser([FromBody] LoginRequest request)
+        {
+            if (string.IsNullOrWhiteSpace(request.UserName) || string.IsNullOrWhiteSpace(request.Password))
+                return BadRequest(new { message = "Username and password are required." });
+
+            try
+            {
+                var user = await _IUsersRepository.ValidateUserAsync(request.UserName, request.Password);
+
+                if (user == null)
+                    return Unauthorized(new { message = "Invalid username or password." });
+
+                return Ok(new { message = "Login successful", user });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An internal error occurred.", details = ex.Message });
             }
         }
     }

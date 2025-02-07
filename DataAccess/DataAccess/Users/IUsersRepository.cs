@@ -1,5 +1,6 @@
 ﻿using ApiUserValidation.Models.DTOs;
 using ApiUserValidation.Models.Entities;
+using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,9 +18,6 @@ namespace ApiUserValidation.Data.DataAccess.Users
         Task<UserResponseDTO> AddUserToExistingPersonAsync(UserCreateDTO userDto);
         Task<int> UpdateUserAsync(UserCreateDTO userDto);
         Task<int> DeleteUserAsync(int personId);
-
-        //UserME ValidateUser(UserME usuario);
-        //bool UpdateUser(UserME user);
-        //bool DeleteUser(int id); // Opcional, si necesitas eliminar usuarios
+        Task<UserAuthDTO?> ValidateUserAsync(string userName, string password);
     }
 }

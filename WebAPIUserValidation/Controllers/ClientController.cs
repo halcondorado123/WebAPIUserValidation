@@ -1,6 +1,7 @@
 ﻿using ApiUserValidation.Data.Configuration;
 using ApiUserValidation.Data.DataAccess.Persons;
 using ApiUserValidation.Models.DTOs;
+using ApiUserValidation.Models.Entities;
 using APIUserValidation.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -35,7 +36,7 @@ namespace APIUserValidation.Controllers
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new { message = ex.Message });
             }
         }
 
@@ -49,7 +50,10 @@ namespace APIUserValidation.Controllers
             try
             {
                 var client = await _personRepository.GetPersonByIdAsync(personId);
-                if (client == null) return NotFound();
+                if (client == null)
+                {
+                    return NotFound(new { message = "No user found with the specified PersonId." });
+                }
 
                 return new JsonResult(client);
             }
@@ -89,7 +93,9 @@ namespace APIUserValidation.Controllers
             try
             {
                 var createdIds = await _personRepository.BulkInsertPeopleAsync(people);
-                return Ok(new { message = $"Successfully inserted {createdIds.Count} people.", ids = createdIds });
+                var idsString = $"[{string.Join(", ", createdIds)}]";
+
+                return Ok(new { message = $"Successfully inserted {createdIds.Count} people.", ids = idsString });
             }
             catch (Exception ex)
             {

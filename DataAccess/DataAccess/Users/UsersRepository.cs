@@ -200,8 +200,6 @@ namespace DataAccess.DataAccessUsers
             }
         }
 
-
-
         public async Task<UserResponseDTO> AddUserToExistingPersonAsync(UserCreateDTO userDto)
         {
             try
@@ -306,6 +304,47 @@ namespace DataAccess.DataAccessUsers
                 throw ExceptionHandler.HandleException(ex);
             }
         }
+
+        public async Task<UserAuthDTO?> ValidateUserAsync(string userName, string password)
+        {
+            try
+            {
+                await using var dbConnection = DBConnection();
+                await dbConnection.OpenAsync();
+
+                var parameters = new DynamicParameters();
+                parameters.Add("@UserName", userName, DbType.String);
+
+                // 🔥 Obtener usuario desde la base de datos
+                var user = await dbConnection.QueryFirstOrDefaultAsync<UserME>(
+                    "[UVA].[SP_VALIDATE_USER]",
+                    parameters,
+                    commandType: CommandType.StoredProcedure
+                );
+
+                // 🔥 Si el usuario no existe
+                if (user == null)
+                    return null;
+
+                // 🔥 Verificar la contraseña con BCrypt (fuera del SP)
+                if (!BCrypt.Net.BCrypt.Verify(password, user.UserPasswordHash))
+                    return null; // Contraseña incorrecta
+
+                // 🔥 Mapear `UserME` a `UserAuthDTO`
+                return new UserAuthDTO
+                {
+                    UserName = user.UserName,
+                    RolId = user.RolId ?? 0,
+                    StatusId = user.StatusId,
+                    LastLogin = user.LastLogin
+                };
+            }
+            catch (SqlException ex)
+            {
+                throw ExceptionHandler.HandleException(ex);
+            }
+        }
+
 
         private UserME MapPersonDTOToEntity(UserCreateDTO userDto)
         {
