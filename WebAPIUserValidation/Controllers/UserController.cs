@@ -133,7 +133,7 @@ namespace APIUserValidation.Controllers
         [SwaggerOperation(
             Summary = SwaggerCommentsENG.Clients.InsertUserToExistingPersonSummary,
             Description = SwaggerCommentsENG.Clients.InsertUserToExistingPersonDescription)]
-        public async Task<IActionResult> InsertUserToExistingPerson([FromBody] UserCreateDTO userDto)
+        public async Task<IActionResult> InsertUserToExistingPerson([FromBody] UserExistentDTO userDto)
         {
             try
             {
@@ -154,7 +154,7 @@ namespace APIUserValidation.Controllers
         [SwaggerOperation(
             Summary = SwaggerCommentsENG.Clients.UpdateUserSummary,
             Description = SwaggerCommentsENG.Clients.UpdateUserDescription)]
-        public async Task<IActionResult> UpdateUser([FromBody] UserCreateDTO userDto)
+        public async Task<IActionResult> UpdateUser([FromBody] UserUpdateDTO userDto)
         {
             try
             {
@@ -175,12 +175,18 @@ namespace APIUserValidation.Controllers
         [SwaggerOperation(
         Summary = SwaggerCommentsENG.Clients.DeleteUserSummary,
         Description = SwaggerCommentsENG.Clients.DeleteUserDescription)]
-        public async Task<IActionResult> DeletePerson(int typeId, int personId)
+        public async Task<IActionResult> DeletePerson(int typeId, string identificationNumber)
         {
             try
             {
-                await _IUsersRepository.DeleteUserAsync(typeId, personId);
-                return Ok(new { Success = true, message = "The user has been successfully deleted." });
+                int? deletedPersonId = await _IUsersRepository.DeleteUserAsync(typeId, identificationNumber);
+
+                if (deletedPersonId == null)
+                {
+                    return BadRequest(new { Success = false, message = "No user found with the provided information." });
+                }
+
+                return Ok(new { Success = true, message = "The user has been successfully deleted.", DeletedPersonId = deletedPersonId });
             }
             catch (Exception ex)
             {

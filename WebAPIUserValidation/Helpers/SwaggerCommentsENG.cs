@@ -29,15 +29,12 @@ namespace APIUserValidation.Helpers
                                                                 + "\n\n✅ personID(int) : ID of each person-user.";
 
 
-            public const string GetUsersByParametersSummary = "Retrieve users by parameters (Identity Document / Email)";
-            public const string GetUsersByParametersDescription = @"⚡ Description: This endpoint allows retrieving a specific user registered in the database by searching with optional input parameters."
-                                                                       + "\n\n\nInput Parameters:"
-                                                                       + "\n\n✅ identificationId (int): Where (1) = Citizenship ID, (2) = Identity Card, (3) = Foreigner ID, (4) = Passport, (5) = Special Stay Permit"
-                                                                       + " along with the identity document number. Both must match for a valid search.";
-
-
-
-
+            public const string GetUsersByParametersSummary = "Get users by parameters (Identity Document / Email)";
+            public const string GetUsersByParametersDescription = @"⚡ Description: This endpoint allows retrieving a specific user registered in the database by searching with input parameters, which are optional depending on the case."
+                                                                   + "\n\n\nInput parameters:"
+                                                                   + "\n\n✅ identificationId (int): Where (1) = Citizenship ID, (2) = Identity Card, (3) = Foreigner ID, (4) = Passport, (5) = Special Stay Permit"
+                                                                   + " and the identity document number. Important: Both must match according to the record; otherwise, the corresponding user will not be retrieved."
+                                                                   + "\n\n✅ email (string): The user's personal email address.";
 
             public const string CreateUserSummary = "Create new users";
             public const string CreateUserDescription = @"⚡ Description: This endpoint allows creating a new user record in the database using the required data in the request body."
@@ -47,7 +44,8 @@ namespace APIUserValidation.Helpers
                                                                + "\n\n✅ clientName (string): User's first name."
                                                                + "\n\n✅ clientLastName (string): User's last name."
                                                                + "\n\n✅ genderId (int): Where (1) = Male, (2) = Female, (3) = Prefer not to say."
-                                                               + "\n\n✅ birthday (Date): User's date of birth. It is important to respect the same format to avoid errors when uploading user information. \n(Example: 2025-02-07T20:03:12.148Z)."
+                                                               + "\n\n✅ birthday (Date): User's date of birth. It is important to respect the same format to avoid errors when uploading user information. \n" 
+                                                               + "(Example: 2025-02-07T20:03:12.148Z)."
                                                                + "\n\n✅ email (string): User's personal email."
                                                                + "\n\n✅ phone (string): User's personal phone number."
                                                                + "\n\n✅ rolId (int): Where (1) = Admin, (2) = User, (3) = Guest, (4) = Editor, (5) = Supervisor, (6) = Manager, (7) = Customer."

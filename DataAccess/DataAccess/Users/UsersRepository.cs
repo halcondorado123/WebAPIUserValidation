@@ -3,6 +3,7 @@ using ApiUserValidation.Data.DataAccess.Users;
 using ApiUserValidation.Data.Exceptions;
 using ApiUserValidation.Models.DTOs;
 using ApiUserValidation.Models.Entities;
+using ApiUserValidation.Models.Entities.UserAttributesME;
 using Dapper;
 using Microsoft.Data.SqlClient;
 using System.Data;
@@ -121,7 +122,7 @@ namespace DataAccess.DataAccessUsers
             try
             {
                 var user = MapPersonDTOToEntity(userDto);
-                user.SetPassword(userDto.Password); // Hash de la contraseña
+                user.SetPassword(userDto.Password);
 
                 var parameters = new
                 {
@@ -137,10 +138,7 @@ namespace DataAccess.DataAccessUsers
                     user.RolId,
                     user.StatusId,
                     user.UserName,
-                    user.CreatedAt,
-                    user.UpdatedAt,
-                    user.LastLogin,
-                    UserPasswordHash = user.UserPasswordHash // Guardar solo el hash
+                    UserPasswordHash = user.UserPasswordHash 
                 };
 
                 await using var dbConnection = DBConnection();
@@ -162,33 +160,19 @@ namespace DataAccess.DataAccessUsers
         }
         public async Task<List<int>> BulkInsertUsersAsync(List<UserCreateDTO> users)
         {
-            var createdIds = new List<int>();
-
             try
             {
                 await using var dbConnection = DBConnection();
                 await dbConnection.OpenAsync();
 
-                //  Filtrar datos duplicados por IdentificationNumber y Email antes de insertar
+                var createdIds = new List<int>();
+
                 var uniqueUsers = users
-                    .GroupBy(p => new { p.IdentificationNumber, p.Email }) // Agrupar por identificación y correo
-                    .Select(g => g.First()) // Tomar solo el primer registro por grupo
-                    .ToList();
+                    .GroupBy(p => new { p.IdentificationNumber, p.Email })
+                    .Select(g => g.First()); // Evitamos materializar la lista
 
-                foreach (var userDto in uniqueUsers)
+                var tasks = uniqueUsers.Select(async userDto =>
                 {
-                    //  Crear una instancia de UserME y generar el hash con SetPassword()
-                    var userEntity = new UserME
-                    {
-                        UserName = userDto.UserName,
-                        RolId = userDto.RolId,
-                        StatusId = userDto.StatusId,
-                        CreatedAt = userDto.CreatedAt,
-                        UpdatedAt = userDto.UpdatedAt,
-                        LastLogin = userDto.LastLogin
-                    };
-                    userEntity.SetPassword(userDto.Password); // ✅ Generar hash aquí
-
                     var parameters = new
                     {
                         userDto.IdentificationId,
@@ -203,22 +187,19 @@ namespace DataAccess.DataAccessUsers
                         userDto.RolId,
                         userDto.StatusId,
                         userDto.UserName,
-                        UserPasswordHash = userEntity.UserPasswordHash, // ✅ Hash ya generado
-                        userDto.CreatedAt,
-                        userDto.UpdatedAt,
-                        userDto.LastLogin
+                        UserPasswordHash = BCrypt.Net.BCrypt.HashPassword(userDto.Password),
                     };
 
-                    int newPersonId = await dbConnection.QuerySingleAsync<int>(
+                    return await dbConnection.QuerySingleAsync<int>(
                         "[UVA].[SP_INSERT_USER]",
                         parameters,
                         commandType: CommandType.StoredProcedure
                     );
+                });
 
-                    createdIds.Add(newPersonId);
-                }
+                createdIds.AddRange(await Task.WhenAll(tasks)); // Agregar IDs en paralelo
 
-                return createdIds; // Retorna la lista de IDs creados
+                return createdIds;
             }
             catch (Exception ex)
             {
@@ -226,8 +207,30 @@ namespace DataAccess.DataAccessUsers
             }
         }
 
-        public async Task<UserResponseDTO> AddUserToExistingPersonAsync(UserCreateDTO userDto)
+
+        public async Task<UserResponseDTO> AddUserToExistingPersonAsync(UserExistentDTO userDto)
         {
+
+            if (string.IsNullOrWhiteSpace(userDto.Password))
+            {
+                throw new ArgumentException("The UserPassword cannot be null or empty.");
+            }
+
+            if (userDto.Password.Contains(" "))
+            {
+                throw new ArgumentException("The UserPassword cannot contain spaces.");
+            }
+
+
+            var user = MapOnlyUserDTOToEntity(userDto);
+
+            //if (user. == null)
+            //{
+            //    throw new Exception("No se pudo insertar el usuario o la persona no existe.");
+            //}
+
+            user.SetPassword(userDto.Password);
+
             try
             {
                 await using var dbConnection = DBConnection();
@@ -239,15 +242,14 @@ namespace DataAccess.DataAccessUsers
                     storedProcedure,
                     new
                     {
-                        userDto.PersonId,
+                        userDto.IdentificationId,
+                        userDto.IdentificationNumber,
                         userDto.UserName,
-                        UserPasswordHash = userDto.Password, // Guardar solo el hash, // Ya debe estar hasheada antes de enviarla
+                        UserPasswordHash = user.UserPasswordHash,
                         userDto.RolId,
                         userDto.StatusId,
-                        userDto.CreatedAt,
-                        userDto.UpdatedAt,
-                        LastLogin = (DateTime?)null // O la fecha actual si lo prefieres
                     },
+
                     commandType: CommandType.StoredProcedure
                 );
 
@@ -263,20 +265,22 @@ namespace DataAccess.DataAccessUsers
                 throw ExceptionHandler.HandleException(ex);
             }
         }
-        public async Task<UserResponseDTO?> UpdateUserAsync(UserCreateDTO userDto)
+
+        public async Task<UserResponseDTO?> UpdateUserAsync(UserUpdateDTO userDto)
         {
             try
             {
-                int personId = userDto.PersonId;
+                int? userId = userDto.IdentificationId;
+                string? identificationNumber = userDto.IdentificationNumber;
+                string? email = userDto.Email;
 
-                // 🔥 1️⃣ Obtener el usuario actual antes de modificar
-                var existingUser = await GetUserByIdAsync(personId);
+
+                var existingUser = await GetUserByParametersAsync(userId, identificationNumber, email);
                 if (existingUser == null)
                 {
                     throw new Exception("User not found.");
                 }
 
-                // 🔥 2️⃣ Ignorar valores `"string"` o `null`, usando los valores actuales
                 userDto.IdentificationNumber = IsInvalid(userDto.IdentificationNumber) ? existingUser.IdentificationNumber : userDto.IdentificationNumber;
                 userDto.ClientName = IsInvalid(userDto.ClientName) ? existingUser.ClientName : userDto.ClientName;
                 userDto.ClientLastName = IsInvalid(userDto.ClientLastName) ? existingUser.ClientLastName : userDto.ClientLastName;
@@ -284,13 +288,12 @@ namespace DataAccess.DataAccessUsers
                 userDto.Phone = IsInvalid(userDto.Phone) ? existingUser.Phone : userDto.Phone;
                 userDto.RolId = existingUser.RolId;
 
-                // 'UserCreateDTO' a 'UserME'
-                var user = MapPersonDTOToEntity(userDto);
+                var user = MapPersonUpdateDTOToEntity(userDto);
                 user.UpdatedAt = DateTime.UtcNow;
 
                 var parameters = new
                 {
-                    user.PersonId,
+                    //user.PersonId,
                     user.IdentificationId,
                     user.IdentificationNumber,
                     user.ClientName,
@@ -304,14 +307,11 @@ namespace DataAccess.DataAccessUsers
                     user.RolId,
                     user.StatusId,
                     UserPasswordHash = user.UserPasswordHash,
-                    user.UpdatedAt,
-                    user.LastLogin
                 };
 
                 await using var dbConnection = DBConnection();
                 await dbConnection.OpenAsync();
 
-                // 🔥 4️⃣ Ejecutar el SP y obtener el usuario actualizado
                 var updatedUser = await dbConnection.QueryFirstOrDefaultAsync<UserResponseDTO>(
                     "[UVA].[SP_UPDATE_USER]",
                     parameters,
@@ -326,13 +326,9 @@ namespace DataAccess.DataAccessUsers
             }
         }
 
-
-
-
-
-        public async Task<int> DeleteUserAsync(int typeId, int personId)
+        public async Task<int?> DeleteUserAsync(int typeId, string identificationNumber)
         {
-            var parameters = new { IdentificationId = typeId, IdentificationNumber = personId };
+            var parameters = new { IdentificationId = typeId, IdentificationNumber = identificationNumber };
 
             try
             {
@@ -340,10 +336,13 @@ namespace DataAccess.DataAccessUsers
                 {
                     await dbConnection.OpenAsync();
 
-                    // Ejecutar el SP y obtener las filas afectadas
-                    int affectedRows = await dbConnection.ExecuteScalarAsync<int>("[UVA].[SP_DELETE_USER]", parameters, commandType: CommandType.StoredProcedure);
+                    int? deletedPersonId = await dbConnection.QuerySingleOrDefaultAsync<int?>(
+                        "[UVA].[SP_DELETE_USER]",
+                        parameters,
+                        commandType: CommandType.StoredProcedure
+                    );
 
-                    return affectedRows; // Retorna el número de filas eliminadas
+                    return deletedPersonId; // Retorna el ID eliminado
                 }
             }
             catch (Exception ex)
@@ -351,6 +350,7 @@ namespace DataAccess.DataAccessUsers
                 throw ExceptionHandler.HandleException(ex);
             }
         }
+
 
         public async Task<UserAuthDTO?> ValidateUserAsync(string userName, string password)
         {
@@ -362,22 +362,22 @@ namespace DataAccess.DataAccessUsers
                 var parameters = new DynamicParameters();
                 parameters.Add("@UserName", userName, DbType.String);
 
-                // 🔥 Obtener usuario desde la base de datos
+                // Obtener usuario desde la base de datos
                 var user = await dbConnection.QueryFirstOrDefaultAsync<UserME>(
                     "[UVA].[SP_VALIDATE_USER]",
                     parameters,
                     commandType: CommandType.StoredProcedure
                 );
 
-                // 🔥 Si el usuario no existe
+                // Si el usuario no existe
                 if (user == null)
                     return null;
 
-                // 🔥 Verificar la contraseña con BCrypt (fuera del SP)
+                // Verificar la contraseña con BCrypt (fuera del SP)
                 if (!BCrypt.Net.BCrypt.Verify(password, user.UserPasswordHash))
                     return null; // Contraseña incorrecta
 
-                // 🔥 Mapear `UserME` a `UserAuthDTO`
+                // Mapear `UserME` a `UserAuthDTO`
                 return new UserAuthDTO
                 {
                     UserName = user.UserName,
@@ -397,7 +397,6 @@ namespace DataAccess.DataAccessUsers
         {
             var user = new UserME
             {
-                PersonId = userDto.PersonId,
                 IdentificationId = userDto.IdentificationId,
                 IdentificationNumber = userDto.IdentificationNumber,
                 ClientName = userDto.ClientName,
@@ -410,9 +409,54 @@ namespace DataAccess.DataAccessUsers
                 RolId = userDto.RolId,
                 StatusId = userDto.StatusId,
                 UserName = userDto.UserName,
-                CreatedAt = userDto.CreatedAt,
-                UpdatedAt = DateTime.UtcNow,  // Actualizamos la fecha de modificación
-                LastLogin = userDto.LastLogin,
+            };
+
+            // Si la contraseña se actualiza, la procesamos
+            if (!string.IsNullOrEmpty(userDto.Password))
+            {
+                user.SetPassword(userDto.Password);  // Hash de la nueva contraseña
+            }
+
+            return user;
+        }
+
+        private UserME MapOnlyUserDTOToEntity(UserExistentDTO userDto)
+        {
+            var user = new UserME
+            {
+                IdentificationId = userDto.IdentificationId,
+                IdentificationNumber = userDto.IdentificationNumber,
+                UserName = userDto.UserName,
+                RolId = userDto.RolId,
+                StatusId = userDto.StatusId,
+            };
+
+
+            if (!string.IsNullOrEmpty(userDto.Password))
+            {
+                user.SetPassword(userDto.Password);
+            }
+
+            return user;
+        }
+
+        private UserME MapPersonUpdateDTOToEntity(UserUpdateDTO userDto)
+        {
+            var user = new UserME
+            {
+                //PersonId = userDto.PersonId,
+                IdentificationId = userDto.IdentificationId,
+                IdentificationNumber = userDto.IdentificationNumber,
+                ClientName = userDto.ClientName,
+                ClientLastName = userDto.ClientLastName,
+                GenderId = userDto.GenderId,
+                Age = CalculateAge(userDto.Birthday),
+                Birthday = userDto.Birthday,
+                Email = userDto.Email,
+                Phone = userDto.Phone,
+                RolId = userDto.RolId,
+                StatusId = userDto.StatusId,
+                UserName = userDto.UserName,
             };
 
             // Si la contraseña se actualiza, la procesamos

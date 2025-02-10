@@ -6,7 +6,7 @@ namespace ApiUserValidation.Models.DTOs
 {
     public class UserCreateDTO
     {
-        public int PersonId { get; set; }
+        //public int PersonId { get; set; }
         public int? IdentificationId { get; set; }
         public string? IdentificationNumber { get; set; }
         public string? ClientName { get; set; }
@@ -20,9 +20,9 @@ namespace ApiUserValidation.Models.DTOs
         public int StatusId { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }  // Aquí se recibe la contraseña en texto plano]
-        public DateTime? CreatedAt { get; set; }
-        public DateTime? UpdatedAt { get; set; }
-        public DateTime? LastLogin { get; set; }
+        //public DateTime? CreatedAt { get; set; }
+        //public DateTime? UpdatedAt { get; set; }
+        //public DateTime? LastLogin { get; set; }
 
     }
 }
