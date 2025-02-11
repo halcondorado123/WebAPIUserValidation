@@ -1,7 +1,5 @@
 ﻿using ApiUserValidation.Data.DataAccess.Users;
-using ApiUserValidation.Data.Exceptions;
 using ApiUserValidation.Models.DTOs;
-using ApiUserValidation.Models.Entities;
 using APIUserValidation.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -202,8 +200,8 @@ namespace APIUserValidation.Controllers
         [Authorize]
         [AllowAnonymous]
         [SwaggerOperation(
-        Summary = SwaggerCommentsENG.Clients.UpdateUserSummary,
-        Description = SwaggerCommentsENG.Clients.UpdateUserDescription)]
+        Summary = SwaggerCommentsENG.Clients.ValidateUserSummary,
+        Description = SwaggerCommentsENG.Clients.ValidateUserDescription)]
         public async Task<IActionResult> ValidateUser([FromBody] LoginRequest request)
         {
             try

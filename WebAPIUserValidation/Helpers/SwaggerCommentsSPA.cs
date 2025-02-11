@@ -15,10 +15,7 @@
 
             public const string GetUsersByParametersSummary = "Obtener usuarios por parametros (Documento de identidad / Email)";
             public const string GetUsersByParametersDescription = @"⚡ Descripción: Este endpoint permite obtener un usuario en especifico registrado en la base de datos, mediante busqueda por parametros de entrada, opcionales sea el caso."
-                                                           + "\n\n\nParámetros de entrada:"
-                                                           + "\n\n✅ identificationId (int): Donde (1) = Cédula de ciudadanía, (2) = Tarjeta de identidad, (3) = Cédula de extranjería, (4) = Pasaporte, (5) = Permiso especial de permanencia"
-                                                           + " y el número del documento de identidad, importante, ambos deben coincidir de acuerdo al registro de lo contrario no traera el usuario correspondiente"
-                                                           + "\n\n✅ email (string): Correo electrónico personal del usuario.";
+                                                                     + "\n\n✅ email (string): Correo electrónico personal del usuario.";
 
 
             public const string CreateUserSummary = "Crear nuevos usuarios";
@@ -79,17 +76,17 @@
                                                                + "\n\n✅ rolId (int): Donde (1) = Admin, (2) = User, (3) = Guest, (4) = Editor, (5) = Supervisor, (6) = Manager, (7) = Customer."
                                                                + "\n\n✅ statusId (int): Donde (1) = Activo, (2) = Inactivo, (3) = Suspendido, (4) = Bloqueado, (5) = Supervisor, (6) = Baneado."
                                                                + "\n\n✅ userName (string): Nombre de usuario."
-                                                               + "\n\n✅ password (string): contraseña establecida por el usuario"
-                                                               + "\n\n✅ UpdatedAt (Date): Fecha de actualización del registro (se genera automáticamente al actualizar el registro)."
-                                                               + "\n\n✅ LastLogin (Date): Fecha del último acceso del usuario (se actualiza automáticamente).";
-
-
+                                                               + "\n\n✅ password (string): contraseña establecida por el usuario";
 
             public const string DeleteUserSummary = "Eliminar usuario de la base de datos";
             public const string DeleteUserDescription = @"⚡ Descripción: Este endpoint permite eliminar los registros de usuario existente en base de datos:"
-                                                           + "\n\n\nParámetros de entrada:"
                                                            + "\n\n✅ identificationId (int): Donde (1) = Cédula de ciudadanía, (2) = Tarjeta de identidad, (3) = Cédula de extranjería, (4) = Pasaporte, (5) = Permiso especial de permanencia"
                                                            + " y el número del documento de identidad, importante, ambos deben coincidir de acuerdo al registro de lo contrario no traera el usuario correspondiente";
+
+            public const string ValidateUserSummary = "Validación de los usuarios registrados";
+            public const string ValidateUserDescription = @"⚡ Descripción: Este endpoint permite realizar la validación de usuarios con contraseñas registrados previamente, este proceso puede vincularse a generación de funcionalidades para users"
+                                                               + "\n\n✅ userName (string): Nombre de usuario."
+                                                               + "\n\n✅ password (string): contraseña establecida por el usuario";
         }
     }
 }

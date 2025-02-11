@@ -9,13 +9,6 @@ namespace ApiUserValidation.Data.Exceptions
             switch (ex)
             {
                 case SqlException sqlEx:
-
-                    if (sqlEx.Message.Contains("No changes detected"))
-                    {
-                        return new Exception(sqlEx.Message);
-                    }
-
-                    // 🔥 Si es otro error, agregamos el prefijo estándar
                     return new Exception($"An error occurred while accessing the database. {sqlEx.Message}");
 
                 case TimeoutException timeoutEx:

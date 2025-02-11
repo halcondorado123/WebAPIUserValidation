@@ -13,8 +13,7 @@ namespace DataAccess.DataAccessUsers
     public class UsersRepository : IUsersRepository
     {
         private ConfigurationData _connectionString;
-        //private readonly WebAppDbContext _context;
-        //private readonly IMapper _mapper;
+
         public UsersRepository(ConfigurationData connectionString)
         {
             _connectionString = connectionString;
@@ -264,6 +263,13 @@ namespace DataAccess.DataAccessUsers
 
         public async Task<UserResponseDTO?> UpdateUserAsync(UserUpdateDTO userDto)
         {
+                        if (string.IsNullOrWhiteSpace(userDto.Password))
+                throw new ArgumentException("The UserPassword cannot be null or empty.");
+            else if (userDto.Password.Contains(" ") || userDto.UserName.Contains(" "))
+                throw new ArgumentException("The UserName or Password cannot contain spaces.");
+            else if (userDto.UserName == "string" || userDto.Password == "string")
+                throw new ArgumentException("Invalid values: UserName or Password cannot be 'string'.");
+
             try
             {
                 int? userId = userDto.IdentificationId;
