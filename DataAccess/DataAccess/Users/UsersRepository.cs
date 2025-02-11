@@ -138,7 +138,7 @@ namespace DataAccess.DataAccessUsers
                     user.RolId,
                     user.StatusId,
                     user.UserName,
-                    UserPasswordHash = user.UserPasswordHash 
+                    UserPasswordHash = user.UserPasswordHash
                 };
 
                 await using var dbConnection = DBConnection();
@@ -160,18 +160,20 @@ namespace DataAccess.DataAccessUsers
         }
         public async Task<List<int>> BulkInsertUsersAsync(List<UserCreateDTO> users)
         {
+            await using var dbConnection = DBConnection();
+            await dbConnection.OpenAsync();
+
+            using var transaction = await dbConnection.BeginTransactionAsync(); // Iniciar transacción
+
             try
             {
-                await using var dbConnection = DBConnection();
-                await dbConnection.OpenAsync();
-
                 var createdIds = new List<int>();
 
                 var uniqueUsers = users
                     .GroupBy(p => new { p.IdentificationNumber, p.Email })
-                    .Select(g => g.First()); // Evitamos materializar la lista
+                    .Select(g => g.First());
 
-                var tasks = uniqueUsers.Select(async userDto =>
+                foreach (var userDto in uniqueUsers)
                 {
                     var parameters = new
                     {
@@ -190,44 +192,40 @@ namespace DataAccess.DataAccessUsers
                         UserPasswordHash = BCrypt.Net.BCrypt.HashPassword(userDto.Password),
                     };
 
-                    return await dbConnection.QuerySingleAsync<int>(
+                    var userId = await dbConnection.QuerySingleAsync<int>(
                         "[UVA].[SP_INSERT_USER]",
                         parameters,
+                        transaction: transaction,
                         commandType: CommandType.StoredProcedure
                     );
-                });
 
-                createdIds.AddRange(await Task.WhenAll(tasks)); // Agregar IDs en paralelo
+                    createdIds.Add(userId);
+                }
+
+                await transaction.CommitAsync();
 
                 return createdIds;
             }
             catch (Exception ex)
             {
+                await transaction.RollbackAsync();
                 throw ExceptionHandler.HandleException(ex);
             }
         }
+
 
 
         public async Task<UserResponseDTO> AddUserToExistingPersonAsync(UserExistentDTO userDto)
         {
 
             if (string.IsNullOrWhiteSpace(userDto.Password))
-            {
                 throw new ArgumentException("The UserPassword cannot be null or empty.");
-            }
-
-            if (userDto.Password.Contains(" "))
-            {
-                throw new ArgumentException("The UserPassword cannot contain spaces.");
-            }
-
+            else if (userDto.Password.Contains(" ") || userDto.UserName.Contains(" "))
+                throw new ArgumentException("The UserName or Password cannot contain spaces.");
+            else if (userDto.UserName == "string" || userDto.Password == "string")
+                throw new ArgumentException("Invalid values: UserName or Password cannot be 'string'.");
 
             var user = MapOnlyUserDTOToEntity(userDto);
-
-            //if (user. == null)
-            //{
-            //    throw new Exception("No se pudo insertar el usuario o la persona no existe.");
-            //}
 
             user.SetPassword(userDto.Password);
 
@@ -254,9 +252,7 @@ namespace DataAccess.DataAccessUsers
                 );
 
                 if (userWithPersonInfo == null)
-                {
-                    throw new Exception("No se pudo insertar el usuario o la persona no existe.");
-                }
+                    throw new Exception("The user could not be inserted or the person does not exist.");
 
                 return userWithPersonInfo;
             }

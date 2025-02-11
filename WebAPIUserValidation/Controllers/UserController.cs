@@ -118,8 +118,12 @@ namespace APIUserValidation.Controllers
             try
             {
                 var createdIds = await _IUsersRepository.BulkInsertUsersAsync(users);
-                var idsString = $"[{string.Join(", ", createdIds)}]";
-                return Ok(new { Success = true , message = $"Successfully inserted {users.Count} users.", ids = createdIds });
+                return Ok(new
+                {
+                    Success = true,
+                    message = $"Successfully inserted {users.Count} users.",
+                    ids = string.Join(", ", createdIds)
+                });
             }
             catch (Exception ex)
             {
