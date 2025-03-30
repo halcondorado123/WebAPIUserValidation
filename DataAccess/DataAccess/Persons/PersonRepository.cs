@@ -21,30 +21,35 @@ namespace ApiUserValidation.Data.DataAccess.Persons
         {
             return new SqlConnection(_connectionString.ConnectionString);
         }
-
-        public async Task<List<PersonDTO>> GetPeopleAsync()
+        public async Task<List<PersonDTO>> GetPeopleAsync(int page = 1, int pageSize = 10)
         {
             try
             {
-                using (var dbConnection = DBConnection())
+                using var dbConnection = await GetOpenDbConnectionAsync();
+                int offset = (page - 1) * pageSize; // Calculamos el desplazamiento
+                string storedProcedure = "[UVA].[SP_GET_PEOPLE]";
+
+                var clients = (await dbConnection.QueryAsync<PersonDTO>(
+                    storedProcedure,
+                    new { Offset = offset, PageSize = pageSize }, // Enviamos los parámetros a la SP
+                    commandType: CommandType.StoredProcedure
+                )).ToList();
+
+                if (!clients.Any())
                 {
-                    await dbConnection.OpenAsync();
-
-                    string storedProcedure = "[UVA].[SP_GET_PEOPLE]";
-
-                    var clients = await dbConnection.QueryAsync<PersonDTO>(
-                        storedProcedure,
-                        commandType: CommandType.StoredProcedure
-                    );
-
-                    return clients.ToList() ?? new List<PersonDTO>();
+                    throw ExceptionHandler.NullHandleException("Customers have not been found in the database.");
                 }
+
+                return clients;
             }
             catch (Exception ex)
             {
-                throw ExceptionHandler.HandleException(ex);
+                // Manejo de errores: loguear y relanzar o devolver una lista vacía
+                Console.WriteLine($"Error fetching people: {ex.Message}");
+                throw; // O podrías retornar una lista vacía: return new List<PersonDTO>();
             }
         }
+
 
         public async Task<PersonDTO> GetPersonByIdAsync(int personId)
         {
@@ -248,6 +253,26 @@ namespace ApiUserValidation.Data.DataAccess.Persons
             {
                 throw ExceptionHandler.HandleException(ex);
             }
+        }
+
+        private async Task<IDbConnection> GetOpenDbConnectionAsync()
+        {
+            var dbConnection = DBConnection(); // Método que obtiene la conexión
+
+            try
+            {
+                await dbConnection.OpenAsync();
+                return dbConnection;
+            }
+            catch (SqlException sqlEx)
+            {
+                throw ExceptionHandler.HandleException(sqlEx);
+            }
+            catch (Exception ex)
+            {
+                throw ExceptionHandler.HandleException(ex);
+            }
+
         }
     }
 }

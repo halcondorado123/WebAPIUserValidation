@@ -216,7 +216,6 @@ namespace DataAccess.DataAccessUsers
 
         public async Task<UserResponseDTO> AddUserToExistingPersonAsync(UserExistentDTO userDto)
         {
-
             if (string.IsNullOrWhiteSpace(userDto.Password))
                 throw new ArgumentException("The UserPassword cannot be null or empty.");
             else if (userDto.Password.Contains(" ") || userDto.UserName.Contains(" "))
@@ -225,7 +224,6 @@ namespace DataAccess.DataAccessUsers
                 throw new ArgumentException("Invalid values: UserName or Password cannot be 'string'.");
 
             var user = MapOnlyUserDTOToEntity(userDto);
-
             user.SetPassword(userDto.Password);
 
             try
@@ -239,14 +237,13 @@ namespace DataAccess.DataAccessUsers
                     storedProcedure,
                     new
                     {
+                        userDto.IdentificationNumber,  // ✅ Usamos IdentificationNumber en lugar de PersonId
                         userDto.IdentificationId,
-                        userDto.IdentificationNumber,
                         userDto.UserName,
                         UserPasswordHash = user.UserPasswordHash,
                         userDto.RolId,
                         userDto.StatusId,
                     },
-
                     commandType: CommandType.StoredProcedure
                 );
 
@@ -261,9 +258,10 @@ namespace DataAccess.DataAccessUsers
             }
         }
 
+
         public async Task<UserResponseDTO?> UpdateUserAsync(UserUpdateDTO userDto)
         {
-                        if (string.IsNullOrWhiteSpace(userDto.Password))
+            if (string.IsNullOrWhiteSpace(userDto.Password))
                 throw new ArgumentException("The UserPassword cannot be null or empty.");
             else if (userDto.Password.Contains(" ") || userDto.UserName.Contains(" "))
                 throw new ArgumentException("The UserName or Password cannot contain spaces.");
@@ -275,7 +273,6 @@ namespace DataAccess.DataAccessUsers
                 int? userId = userDto.IdentificationId;
                 string? identificationNumber = userDto.IdentificationNumber;
                 string? email = userDto.Email;
-
 
                 var existingUser = await GetUserByParametersAsync(userId, identificationNumber, email);
                 if (existingUser == null)
@@ -295,7 +292,7 @@ namespace DataAccess.DataAccessUsers
 
                 var parameters = new
                 {
-                    //user.PersonId,
+                    PersonId = existingUser.PersonId, // ¡Este es el parámetro que faltaba!
                     user.IdentificationId,
                     user.IdentificationNumber,
                     user.ClientName,

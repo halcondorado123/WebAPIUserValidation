@@ -31,7 +31,9 @@ namespace ApiUserValidation.Data.Context
             // Configuración del campo PersonId como IDENTITY
             modelBuilder.Entity<PersonME>()
                 .Property(p => p.PersonId)
-                .ValueGeneratedOnAdd();  // Esto es suficiente para que el valor sea generado automáticamente
+                .ValueGeneratedOnAdd() // Esto es suficiente para que el valor sea generado automáticamente
+                .UseIdentityColumn(1, 1); // Asegura que el IDENTITY incremente de 1 en 1
+
 
             // Generación automática de IDs para otras tablas
             modelBuilder.Entity<GenderME>()

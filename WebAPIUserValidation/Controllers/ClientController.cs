@@ -1,6 +1,7 @@
 ﻿using ApiUserValidation.Data.Configuration;
 using ApiUserValidation.Data.DataAccess.Persons;
 using ApiUserValidation.Models.DTOs;
+using ApiUserValidation.Models.Entities;
 using APIUserValidation.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -26,16 +27,18 @@ namespace APIUserValidation.Controllers
         //[SwaggerOperation(
         //    Summary = SwaggerCommentsENG.Clients.GetAllUsersSummary,
         //    Description = SwaggerCommentsENG.Clients.GetAllUsersDescription)]
-        public async Task<IActionResult> GetClients()
+        public async Task<IActionResult> GetClients(int page = 1, int pageSize = 10)
         {
             try
             {
-                var clients = await _personRepository.GetPeopleAsync();
-                return new JsonResult(clients);
+                var clients = await _personRepository.GetPeopleAsync(page, pageSize);
+                if (clients == null || !clients.Any()) return NotFound(new { message = "No users found in the database." });
+
+                return Ok(new { message = "Success", data = clients });
             }
             catch (Exception ex)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { Success = false, message = ex.Message });
             }
         }
 
