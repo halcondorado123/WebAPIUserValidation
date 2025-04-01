@@ -1,4 +1,5 @@
 ﻿using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.SwaggerGen;
 
 public static class SwaggerConfig
 {
@@ -18,7 +19,7 @@ public static class SwaggerConfig
                 Scheme = "Bearer",
                 BearerFormat = "JWT",
                 In = ParameterLocation.Header,
-                Description = "Ingrese el token JWT en el formato: Bearer {tu_token_jwt}"
+                Description = "Ingrese el token JWT en el formato, no es necesario escribir la palabra Token, solo ingrese el Token."
             });
 
             // Requerir el esquema de seguridad para todas las operaciones
@@ -36,6 +37,7 @@ public static class SwaggerConfig
                         new string[] {}
                     }
             });
+            //c.OperationFilter<AddAuthResponses>();
         });
     }
 
@@ -50,4 +52,19 @@ public static class SwaggerConfig
             c.SwaggerEndpoint("/swagger/v1/swagger.json", "UserValidation V1");
         });
     }
+
+    //public class AddAuthResponses : IOperationFilter
+    //{
+    //    public void Apply(OpenApiOperation operation, OperationFilterContext context)
+    //    {
+    //        if (operation.Responses.ContainsKey("401"))
+    //        {
+    //            operation.Responses["401"] = new OpenApiResponse
+    //            {
+    //                Description = "No autorizado. Inicia sesión para acceder.",
+    //            };
+    //        }
+    //    }
+    //}
+
 }

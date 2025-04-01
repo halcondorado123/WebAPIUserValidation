@@ -1,10 +1,13 @@
-﻿namespace APIUserValidation.Modules
+﻿using ApiUserValidation.Services.Services;
+
+namespace APIUserValidation.Modules
 {
     public static class InjectionExtensions
     {
-        public static IServiceCollection AddInection(this IServiceCollection services, IConfiguration configuration)
+        public static IServiceCollection AddInjection(this IServiceCollection services, IConfiguration configuration)
         {
             services.AddSingleton<IConfiguration>(configuration);
+            //services.AddScoped<JwtService>();
 
             //SAMPLE
             //services.AddSingleton<DapperContext>();

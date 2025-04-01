@@ -11,6 +11,7 @@ namespace APIUserValidation.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class ClientController : ControllerBase
     {
         private readonly IPersonRepository _personRepository;
@@ -22,7 +23,7 @@ namespace APIUserValidation.Controllers
             _configurationData = configurationData;
         }
 
-        [AllowAnonymous]
+        //[AllowAnonymous]
         [HttpGet("GetClients")]
         //[SwaggerOperation(
         //    Summary = SwaggerCommentsENG.Clients.GetAllUsersSummary,
@@ -42,7 +43,6 @@ namespace APIUserValidation.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpGet("GetClientByID{personId}")]
         //[SwaggerOperation(
         //Summary = SwaggerCommentsENG.Clients.GetUserByIdSummary,
@@ -65,7 +65,6 @@ namespace APIUserValidation.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("CreatePerson")]
         [SwaggerOperation(
          Summary = SwaggerCommentsENG.Clients.CreateUserSummary,
@@ -84,8 +83,6 @@ namespace APIUserValidation.Controllers
             }
         }
 
-
-        [AllowAnonymous]
         [HttpPost("BulkInsertPeople")]
         [SwaggerOperation(
          Summary = SwaggerCommentsENG.Clients.CreateUserSummary,
@@ -105,9 +102,6 @@ namespace APIUserValidation.Controllers
             }
         }
 
-
-
-        [AllowAnonymous]
         [HttpPut("UpdatePerson")]
         [SwaggerOperation(
         Summary = SwaggerCommentsENG.Clients.UpdateUserSummary,
@@ -126,7 +120,6 @@ namespace APIUserValidation.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpDelete("DeletePerson")]
         [SwaggerOperation(
         Summary = SwaggerCommentsENG.Clients.DeleteUserSummary,

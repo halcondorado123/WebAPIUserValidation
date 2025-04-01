@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+锘縰sing Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -12,13 +12,13 @@ using DataAccess.DataAccessUsers;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configuraci髇 de servicios
+// Configuraci贸n de servicios
 builder.Services.AddCors();
 builder.Services.AddSingleton(new ConfigurationData(builder.Configuration.GetConnectionString("SQLConnection")));
 
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
-// Configuraci髇 de la base de datos
+// Configuraci贸n de la base de datos
 builder.Services.AddDbContext<WebAppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("SQLConnection"),
         b => b.MigrationsAssembly("APIUserValidation")));
@@ -26,49 +26,70 @@ builder.Services.AddDbContext<WebAppDbContext>(options =>
 
 
 
-// Configuraci髇 de repositorios y servicios
+// Configuraci贸n de repositorios y servicios
 //builder.Services.AddScoped<IClientsRepository, ClientsRepository>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
 builder.Services.AddScoped<IPersonRepository, PersonRepository>();
 builder.Services.AddScoped<IUsersRepository, UsersRepository>();
+builder.Services.AddScoped<JwtService>();
 builder.Services.AddControllers();
 
 // MODULES
 builder.Services.AddSwaggerServices();
 builder.Services.AddMapper();
 
-// Configuraci髇 de autenticaci髇 JWT
-var key = Encoding.ASCII.GetBytes(builder.Configuration["Jwt:SecretKey"]);
-builder.Services.AddAuthentication(x =>
+
+
+// 馃敼 Verificar que la clave JWT no sea nula
+var jwtKey = builder.Configuration["JwtConfig:Key"];
+
+if (string.IsNullOrEmpty(jwtKey) || jwtKey.Length < 32)
 {
-    x.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    x.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(x =>
+    throw new InvalidOperationException("JWT Key is missing or too short in configuration.");
+}
+
+var key = Encoding.UTF8.GetBytes(jwtKey);
+
+// 馃敼 Configuraci贸n de autenticaci贸n JWT
+builder.Services.AddAuthentication(options =>
 {
-    x.RequireHttpsMetadata = false; // Cambia a true en producci髇
-    x.SaveToken = true;
-    x.TokenValidationParameters = new TokenValidationParameters
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+}).AddJwtBearer(options =>
+{
+    options.RequireHttpsMetadata = false;
+    options.SaveToken = true;
+    options.TokenValidationParameters = new TokenValidationParameters
     {
+        ValidIssuer = builder.Configuration["JwtConfig:Issuer"],
+        ValidAudience = builder.Configuration["JwtConfig:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey)),
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
         ValidateIssuerSigningKey = true,
-        IssuerSigningKey = new SymmetricSecurityKey(key),
-        ValidateIssuer = false,
-        ValidateAudience = false
+        ClockSkew = TimeSpan.Zero // 馃敼 Evita problemas de sincronizaci贸n de tiempo en la validaci贸n
     };
 });
 
-// Crear la aplicaci髇
+builder.Services.AddAuthorization();
+
+// Crear la aplicaci贸n
 var app = builder.Build();
 
-// Llamar a la inicializaci髇 de la base de datos
+// Llamar a la inicializaci贸n de la base de datos
 await DatabaseInitializer.SeedDataAsync(app.Services);
 
-// Configuraci髇 del middleware
+// Configura el middleware de autenticaci贸n personalizado antes de otros middlewares
+app.UseMiddleware<CustomAuthenticationMiddleware>();
+
+// Configuraci贸n del middleware
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 
-    // Llamar al m閠odo para usar el middleware de Swagger desde el helper
+    // Llamar al m茅todo para usar el middleware de Swagger desde el helper
     app.UseSwaggerMiddleware();
 }
 
@@ -80,13 +101,24 @@ app.UseCors(option =>
     option.AllowAnyOrigin();
 });
 
-// Configuraci髇 del middleware HTTPS y rutas
+// Configuraci贸n del middleware HTTPS y rutas
 app.UseHttpsRedirection();
 app.UseRouting();
 
-// Configuraci髇 de autenticaci髇 y autorizaci髇
+// Configuraci贸n de autenticaci贸n y autorizaci贸n
 app.UseAuthentication();
 app.UseAuthorization();
+
+//// Middleware para personalizar los mensajes de error de autorizaci贸n
+//app.UseStatusCodePages(async context =>
+//{
+//    if (context.HttpContext.Response.StatusCode == 401) // Unauthorized
+//    {
+//        context.HttpContext.Response.ContentType = "application/json";
+//        var response = new { message = "No tienes permiso para acceder a este recurso. Por favor, inicia sesi贸n." };
+//        await context.HttpContext.Response.WriteAsJsonAsync(response);
+//    }
+//});
 
 // Mapear controladores
 app.MapControllers();

@@ -1,4 +1,4 @@
-﻿namespace ApiUserValidation.Models.Entities
+﻿namespace ApiUserValidation.Models.Entities.TokenME
 {
     public class LoginRequest
     {

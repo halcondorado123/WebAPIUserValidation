@@ -4,12 +4,13 @@ using APIUserValidation.Helpers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
-using LoginRequest = ApiUserValidation.Models.Entities.LoginRequest;
+using LoginRequest = ApiUserValidation.Models.Entities.TokenME.LoginRequest;
 
 namespace APIUserValidation.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class UsersController : ControllerBase
     {
         private readonly IUsersRepository _IUsersRepository;
@@ -21,9 +22,8 @@ namespace APIUserValidation.Controllers
             _configuration = configuration;
         }
 
+        //[AllowAnonymous]
         [HttpGet("GetUsers")]
-        [Authorize]
-        [AllowAnonymous]
         [SwaggerOperation(
             Summary = SwaggerCommentsENG.Clients.GetUsersSummary,
             Description = SwaggerCommentsENG.Clients.GetUsersDescription)]
@@ -45,8 +45,6 @@ namespace APIUserValidation.Controllers
         }
 
         [HttpGet("GetUserById/{id}")]
-        [Authorize]
-        [AllowAnonymous]
         [SwaggerOperation(
             Summary = SwaggerCommentsENG.Clients.GetUsersByIdSummary,
             Description = SwaggerCommentsENG.Clients.GetUsersByIdDescription)]
@@ -66,8 +64,6 @@ namespace APIUserValidation.Controllers
         }
 
         [HttpGet("GetUserByParameters")]
-        [Authorize]
-        [AllowAnonymous]
         [SwaggerOperation(
         Summary = SwaggerCommentsENG.Clients.GetUsersByParametersSummary,
         Description = SwaggerCommentsENG.Clients.GetUsersByParametersDescription)]
@@ -87,8 +83,6 @@ namespace APIUserValidation.Controllers
         }
 
         [HttpPost("CreateUser")]
-        [Authorize]
-        [AllowAnonymous]
         [SwaggerOperation(
             Summary = SwaggerCommentsENG.Clients.CreateUserSummary,
             Description = SwaggerCommentsENG.Clients.CreateUserDescription)]
@@ -106,7 +100,6 @@ namespace APIUserValidation.Controllers
             }
         }
 
-        [AllowAnonymous]
         [HttpPost("BulkInsertUsers")]
         [SwaggerOperation(
          Summary = SwaggerCommentsENG.Clients.BulkInsertUsersSummary,
@@ -130,8 +123,6 @@ namespace APIUserValidation.Controllers
         }
 
         [HttpPut("InsertUserToExistingPerson")]
-        [Authorize]
-        [AllowAnonymous]
         [SwaggerOperation(
             Summary = SwaggerCommentsENG.Clients.InsertUserToExistingPersonSummary,
             Description = SwaggerCommentsENG.Clients.InsertUserToExistingPersonDescription)]
@@ -151,8 +142,6 @@ namespace APIUserValidation.Controllers
         }
 
         [HttpPut("UpdateUser")]
-        [Authorize]
-        [AllowAnonymous]
         [SwaggerOperation(
             Summary = SwaggerCommentsENG.Clients.UpdateUserSummary,
             Description = SwaggerCommentsENG.Clients.UpdateUserDescription)]
@@ -172,8 +161,6 @@ namespace APIUserValidation.Controllers
         }
 
         [HttpDelete("DeletePerson")]
-        [Authorize]
-        [AllowAnonymous]
         [SwaggerOperation(
         Summary = SwaggerCommentsENG.Clients.DeleteUserSummary,
         Description = SwaggerCommentsENG.Clients.DeleteUserDescription)]
@@ -197,8 +184,6 @@ namespace APIUserValidation.Controllers
         }
 
         [HttpPost("Validate_User")]
-        [Authorize]
-        [AllowAnonymous]
         [SwaggerOperation(
         Summary = SwaggerCommentsENG.Clients.ValidateUserSummary,
         Description = SwaggerCommentsENG.Clients.ValidateUserDescription)]
