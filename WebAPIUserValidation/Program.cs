@@ -24,8 +24,6 @@ builder.Services.AddDbContext<WebAppDbContext>(options =>
         b => b.MigrationsAssembly("APIUserValidation")));
 
 
-
-
 // Configuración de repositorios y servicios
 //builder.Services.AddScoped<IClientsRepository, ClientsRepository>();
 builder.Services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
@@ -108,17 +106,6 @@ app.UseRouting();
 // Configuración de autenticación y autorización
 app.UseAuthentication();
 app.UseAuthorization();
-
-//// Middleware para personalizar los mensajes de error de autorización
-//app.UseStatusCodePages(async context =>
-//{
-//    if (context.HttpContext.Response.StatusCode == 401) // Unauthorized
-//    {
-//        context.HttpContext.Response.ContentType = "application/json";
-//        var response = new { message = "No tienes permiso para acceder a este recurso. Por favor, inicia sesión." };
-//        await context.HttpContext.Response.WriteAsJsonAsync(response);
-//    }
-//});
 
 // Mapear controladores
 app.MapControllers();

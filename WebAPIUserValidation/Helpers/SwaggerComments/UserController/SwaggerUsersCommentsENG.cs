@@ -1,13 +1,4 @@
-﻿using ApiUserValidation.Models.Entities.UserAttributesME;
-using ApiUserValidation.Models.Entities;
-using Microsoft.AspNetCore.Http.HttpResults;
-using System.Numerics;
-using Microsoft.SqlServer.Server;
-using Microsoft.Win32;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using System.Diagnostics;
-
-namespace APIUserValidation.Helpers.SwaggerComments.UserController
+﻿namespace APIUserValidation.Helpers.SwaggerComments.UserController
 {
     public static class SwaggerUsersCommentsENG
     {

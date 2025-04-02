@@ -1,9 +1,7 @@
 ﻿using ApiUserValidation.Data.Configuration;
 using ApiUserValidation.Data.DataAccess.Persons;
 using ApiUserValidation.Models.DTOs;
-using ApiUserValidation.Models.Entities;
 using APIUserValidation.Helpers.SwaggerComments.ClientControlles;
-using APIUserValidation.Helpers.SwaggerComments.UserController;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;

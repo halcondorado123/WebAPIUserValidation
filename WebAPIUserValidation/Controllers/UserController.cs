@@ -25,8 +25,8 @@ namespace APIUserValidation.Controllers
         //[AllowAnonymous]
         [HttpGet("GetUsers")]
         [SwaggerOperation(
-            Summary = SwaggerUsersCommentsENG.Users.GetUsersSummary,
-            Description = SwaggerUsersCommentsENG.Users.GetUsersDescription)]
+            Summary = SwaggerUsersCommentsSPA.Users.GetUsersSummary,
+            Description = SwaggerUsersCommentsSPA.Users.GetUsersDescription)]
         public async Task<IActionResult> GetUsers(int page = 1, int pageSize = 10)
         {
             try
@@ -46,8 +46,8 @@ namespace APIUserValidation.Controllers
 
         [HttpGet("GetUserById/{id}")]
         [SwaggerOperation(
-            Summary = SwaggerUsersCommentsENG.Users.GetUsersByIdSummary,
-            Description = SwaggerUsersCommentsENG.Users.GetUsersByIdDescription)]
+            Summary = SwaggerUsersCommentsSPA.Users.GetUsersByIdSummary,
+            Description = SwaggerUsersCommentsSPA.Users.GetUsersByIdDescription)]
         public async Task<IActionResult> GetUserById(int id)
         {
             try
@@ -65,8 +65,8 @@ namespace APIUserValidation.Controllers
 
         [HttpGet("GetUserByParameters")]
         [SwaggerOperation(
-        Summary = SwaggerUsersCommentsENG.Users.GetUsersByParametersSummary,
-        Description = SwaggerUsersCommentsENG.Users.GetUsersByParametersDescription)]
+        Summary = SwaggerUsersCommentsSPA.Users.GetUsersByParametersSummary,
+        Description = SwaggerUsersCommentsSPA.Users.GetUsersByParametersDescription)]
         public async Task<IActionResult> GetUserByParameters(int? userTypeId, string? userId, string? email)
         {
             try
@@ -84,8 +84,8 @@ namespace APIUserValidation.Controllers
 
         [HttpPost("CreateUser")]
         [SwaggerOperation(
-            Summary = SwaggerUsersCommentsENG.Users.CreateUserSummary,
-            Description = SwaggerUsersCommentsENG.Users.CreateUserDescription)]
+            Summary = SwaggerUsersCommentsSPA.Users.CreateUserSummary,
+            Description = SwaggerUsersCommentsSPA.Users.CreateUserDescription)]
         public async Task<IActionResult> CreateUser([FromBody] UserCreateDTO userDto)
         {
             try
@@ -102,8 +102,8 @@ namespace APIUserValidation.Controllers
 
         [HttpPost("BulkInsertUsers")]
         [SwaggerOperation(
-         Summary = SwaggerUsersCommentsENG.Users.BulkInsertUsersSummary,
-         Description = SwaggerUsersCommentsENG.Users.BulkInsertUsersDescription)]
+         Summary = SwaggerUsersCommentsSPA.Users.BulkInsertUsersSummary,
+         Description = SwaggerUsersCommentsSPA.Users.BulkInsertUsersDescription)]
         public async Task<IActionResult> BulkInsertUsers([FromBody] List<UserCreateDTO> users)
         {
             try
@@ -124,8 +124,8 @@ namespace APIUserValidation.Controllers
 
         [HttpPut("InsertUserToExistingPerson")]
         [SwaggerOperation(
-            Summary = SwaggerUsersCommentsENG.Users.InsertUserToExistingPersonSummary,
-            Description = SwaggerUsersCommentsENG.Users.InsertUserToExistingPersonDescription)]
+            Summary = SwaggerUsersCommentsSPA.Users.InsertUserToExistingPersonSummary,
+            Description = SwaggerUsersCommentsSPA.Users.InsertUserToExistingPersonDescription)]
         public async Task<IActionResult> InsertUserToExistingPerson([FromBody] UserExistentDTO userDto)
         {
             try
@@ -143,8 +143,8 @@ namespace APIUserValidation.Controllers
 
         [HttpPut("UpdateUser")]
         [SwaggerOperation(
-            Summary = SwaggerUsersCommentsENG.Users.UpdateUserSummary,
-            Description = SwaggerUsersCommentsENG.Users.UpdateUserDescription)]
+            Summary = SwaggerUsersCommentsSPA.Users.UpdateUserSummary,
+            Description = SwaggerUsersCommentsSPA.Users.UpdateUserDescription)]
         public async Task<IActionResult> UpdateUser([FromBody] UserUpdateDTO userDto)
         {
             try
@@ -162,8 +162,8 @@ namespace APIUserValidation.Controllers
 
         [HttpDelete("DeletePerson")]
         [SwaggerOperation(
-        Summary = SwaggerUsersCommentsENG.Users.DeleteUserSummary,
-        Description = SwaggerUsersCommentsENG.Users.DeleteUserDescription)]
+        Summary = SwaggerUsersCommentsSPA.Users.DeleteUserSummary,
+        Description = SwaggerUsersCommentsSPA.Users.DeleteUserDescription)]
         public async Task<IActionResult> DeletePerson(int typeId, string identificationNumber)
         {
             try
@@ -185,8 +185,8 @@ namespace APIUserValidation.Controllers
 
         [HttpPost("Validate_User")]
         [SwaggerOperation(
-        Summary = SwaggerUsersCommentsENG.Users.ValidateUserSummary,
-        Description = SwaggerUsersCommentsENG.Users.ValidateUserDescription)]
+        Summary = SwaggerUsersCommentsSPA.Users.ValidateUserSummary,
+        Description = SwaggerUsersCommentsSPA.Users.ValidateUserDescription)]
         public async Task<IActionResult> ValidateUser([FromBody] LoginRequest request)
         {
             try

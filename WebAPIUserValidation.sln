@@ -9,7 +9,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiUserValidation.Data", "D
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiUserValidation.Models", "Models\ApiUserValidation.Models.csproj", "{4A2CF7EB-012A-4961-A9BD-7DC5EC4886E0}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ApiUserValidation.Services", "ApiUserValidation.Services\ApiUserValidation.Services.csproj", "{73898757-516C-48B7-8450-6C3159683AF8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiUserValidation.Services", "ApiUserValidation.Services\ApiUserValidation.Services.csproj", "{73898757-516C-48B7-8450-6C3159683AF8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
