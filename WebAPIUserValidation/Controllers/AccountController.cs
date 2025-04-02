@@ -1,8 +1,11 @@
 ﻿using ApiUserValidation.Data.Context;
 using ApiUserValidation.Models.Entities.TokenME;
 using ApiUserValidation.Services.Services;
+using APIUserValidation.Helpers.SwaggerComments.AccountController;
+using APIUserValidation.Helpers.SwaggerComments.ClientControlles;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace APIUserValidation.Controllers
 {
@@ -21,6 +24,9 @@ namespace APIUserValidation.Controllers
 
         [AllowAnonymous]
         [HttpPost]
+        [SwaggerOperation(
+            Summary = SwaggerTokenGenerateCommentSPA.UserAuthorization.UserAccountTokenSummary,
+            Description = SwaggerTokenGenerateCommentSPA.UserAuthorization.UserAccountTokenDescription)]
         public async Task<ActionResult<LoginResponseModel>> Login(LoginRequest request)
         {
             // Llamar al servicio de autenticación
@@ -31,7 +37,6 @@ namespace APIUserValidation.Controllers
             {
                 return Unauthorized(); // Retorna 401 si las credenciales son incorrectas
             }
-
             // Si la autenticación es exitosa, retorna el token JWT
             return Ok(result); // Retorna 200 con el objeto LoginResponseModel
         }

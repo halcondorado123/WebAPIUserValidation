@@ -1,10 +1,10 @@
-﻿namespace APIUserValidation.Helpers
+﻿namespace APIUserValidation.Helpers.SwaggerComments.UserController
 {
-    public static class SwaggerCommentsSPA
+    public static class SwaggerUsersCommentsSPA
     {
-        public static class Clients
+        public static class Users
         {
-            public const string GetUsersSummary = "Obtener usuarios";
+            public const string GetUsersSummary = "Obtener clientes";
             public const string GetUsersDescription = @"⚡ Descripción: Este endpoint permite obtener todos los usuarios registrados en la base de datos mediante busqueda global, con soporte para paginación."
                                                            + "\n\n✅ page (int) : Número de página(por defecto: 1)"
                                                            + "\n\n✅ size (int) : Cantidad de registros por página (Valor por defecto: 10)";
@@ -61,7 +61,7 @@
                                                                + "\n\n✅ password (string): contraseña establecida por el usuario"
                                                                + "\n\n✅ rolId (int): Donde (1) = Admin, (2) = User, (3) = Guest, (4) = Editor, (5) = Supervisor, (6) = Manager, (7) = Customer."
                                                                + "\n\n✅ statusId (int): Donde (1) = Activo, (2) = Inactivo, (3) = Suspendido, (4) = Bloqueado, (5) = Supervisor, (6) = Baneado.";
-           
+
             public const string UpdateUserSummary = "Actualizar usuario en base a una persona ya registrado";
             public const string UpdateUserDescription = @"⚡ Descripción: Este endpoint permite actualizar los registros de usuario existente en base de datos:"
                                                                + "\n\n🚨 Atención: \n\nTodos los datos requeridos deben ser proporcionados en su totalidad; de lo contrario, se generará un error.Puede cargar los registros en formato JSON para su procesamiento."

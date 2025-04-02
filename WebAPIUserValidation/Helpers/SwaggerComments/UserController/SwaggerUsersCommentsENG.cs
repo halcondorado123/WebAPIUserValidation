@@ -7,11 +7,11 @@ using Microsoft.Win32;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 using System.Diagnostics;
 
-namespace APIUserValidation.Helpers
+namespace APIUserValidation.Helpers.SwaggerComments.UserController
 {
-    public static class SwaggerCommentsENG
+    public static class SwaggerUsersCommentsENG
     {
-        public static class Clients
+        public static class Users
         {
 
 
@@ -63,7 +63,7 @@ namespace APIUserValidation.Helpers
                                                                      + "\n\n✅ statusId (int): Where (1) = Active, (2) = Inactive, (3) = Suspended, (4) = Blocked, (5) = Supervisor, (6) = Banned."
                                                                      + "\n\n✅ userName (string): Username."
                                                                      + "\n\n✅ password (string): User-defined password.";
-                                                                    
+
 
             public const string InsertUserToExistingPersonSummary = "Create User for an Existing Person";
             public const string InsertUserToExistingPersonDescription = @"⚡ Description: This endpoint allows inserting user information for an already registered person, in order to complete the corresponding registration:"
@@ -74,7 +74,7 @@ namespace APIUserValidation.Helpers
                                                                                + "\n\n✅ password (string): User-defined password."
                                                                                + "\n\n✅ rolId (int): Where (1) = Admin, (2) = User, (3) = Guest, (4) = Editor, (5) = Supervisor, (6) = Manager, (7) = Customer."
                                                                                + "\n\n✅ statusId (int): Where (1) = Active, (2) = Inactive, (3) = Suspended, (4) = Blocked, (5) = Supervisor, (6) = Banned.";
-                                                                               
+
             public const string UpdateUserSummary = "Update an existing user based on a registered person";
             public const string UpdateUserDescription = @"⚡ Description: This endpoint allows updating the records of an existing user in the database:"
                                                        + "\n\n🚨 Attention: \n\nAll required data must be fully provided; otherwise, an error will be generated. You can upload records in JSON format for processing."
@@ -90,7 +90,7 @@ namespace APIUserValidation.Helpers
                                                        + "\n\n✅ statusId (int): Where (1) = Active, (2) = Inactive, (3) = Suspended, (4) = Blocked, (5) = Supervisor, (6) = Banned."
                                                        + "\n\n✅ userName (string): Username."
                                                        + "\n\n✅ password (string): User-defined password.";
-                                                       
+
             public const string DeleteUserSummary = "Delete user from the database";
             public const string DeleteUserDescription = @"⚡ Description: This endpoint allows deleting existing user records from the database:"
                                                        + "\n\n✅ identificationId (int): Where (1) = Citizenship ID, (2) = Identity Card, (3) = Foreigner ID, (4) = Passport, (5) = Special Stay Permit."
